@@ -17,13 +17,13 @@
 # under the License.
 #
 
-require 'qpid/errors'
-require 'qpid/duration'
-require 'qpid/address'
-require 'qpid/message'
-require 'qpid/sender'
-require 'qpid/receiver'
-require 'qpid/session'
-require 'qpid/connection'
-require 'qpid/utils'
+# To create the Makefile then you need to specify the location
+# of the Qpid shared libraries using the commandline:
+#
+#  $ ruby extconf.rb --with-qpid-lib=[path to libraries]
+#
+
+require 'mkmf'
+
+create_makefile('nonblockio')
 

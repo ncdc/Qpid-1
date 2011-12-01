@@ -172,12 +172,17 @@ module Qpid
       #++
       def acknowledge(args = {})
         sync = args[:sync] || false
-        message = args[:message] if args[:message]
+        message = args[:message] || nil
 
-        unless message.nil?
-          @session_impl.acknowledge message.message_impl, sync
+        # if we're running synchronously then call the private function
+        if sync
+          self.acknowledge_with_sync message
         else
-          @session_impl.acknowledge sync
+          unless message.nil?
+            @session_impl.acknowledge message.message_impl, sync
+          else
+            @session_impl.acknowledge sync
+          end
         end
       end
 
@@ -204,7 +209,11 @@ module Qpid
       #++
       def sync(args = {})
         block = args[:block] || false
-        @session_impl.sync block
+        if block
+          self.sync_and_block
+        else
+          @session_impl.sync block
+        end
       end
 
       # Returns the total number of receivable messages, and messages already
@@ -230,14 +239,8 @@ module Qpid
       #     puts "Received message: #{msg.content}"
       #   end
       def next_receiver(timeout = Qpid::Messaging::Duration::FOREVER, &block)
-        receiver_impl = @session_impl.nextReceiver(timeout.duration_impl)
-
-        unless receiver_impl.nil?
-          recv = Qpid::Messaging::Receiver.new self, receiver_impl
-          block.call recv unless block.nil?
-        end
-
-        return recv
+        # this method is implemented as native code
+        # and is only maintained for rdoc purposes
       end
 
       # Returns true if there were exceptions on this session.

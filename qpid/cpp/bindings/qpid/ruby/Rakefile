@@ -68,7 +68,10 @@ namespace :test do
     t.spec_files = FileList["spec/**/*_spec.rb"]
     t.rcov       = true
     t.rcov_opts  = [
-                    '--exclude', 'lib\/qpid.rb,spec\/,lib\/ruby',
+                    '--exclude',
+                    'lib\/qpid.rb,' +
+                    'lib\/qpid\/utils.rb,' +
+                    'spec\/,lib\/ruby',
                    ]
   end
 
@@ -91,7 +94,9 @@ Rake::RDocTask.new(:rdoc => "rdoc",
                    :rerdoc => "rdoc:force") do |rd|
   rd.main    = "README.rdoc"
   rd.options << "--all"
-  rd.rdoc_files.include("README.rdoc", "lib/**/*.rb")
+  rd.rdoc_files.include("README.rdoc",
+                        "lib/**/*.rb",
+                        "ext/**/*.c")
 end
 
 #-----------------
