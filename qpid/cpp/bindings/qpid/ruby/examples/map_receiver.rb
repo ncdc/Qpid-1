@@ -43,8 +43,13 @@ begin
   session = connection.create_session
   receiver = session.create_receiver address
 
-  message = receiver.fetch
-  content = message.content
+  begin
+    message = receiver.fetch
+    content = message.content
+  rescue Exception => error
+    puts "ERROR: #{error}"
+    error.backtrace.each {|line| puts line}
+  end
 
   print "content-type:#{message.content_type}"
   print "{"

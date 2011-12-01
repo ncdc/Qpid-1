@@ -38,11 +38,6 @@ module Qpid
     #   receiver = session.create_receiver "my-sender-queue"
     class Receiver
 
-      def initialize(session, receiver_impl) # :nodoc:
-        @session       = session
-        @receiver_impl = receiver_impl
-      end
-
       def receiver_impl # :nodoc:
         @receiver_impl
       end
@@ -72,8 +67,8 @@ module Qpid
       #     end
       #   end
       def get(duration = Qpid::Messaging::Duration::FOREVER)
-        message_impl = @receiver_impl.get duration.duration_impl
-        create_message_wrapper message_impl unless message_impl.nil?
+        # this method is implemented in native code
+        # and this stub is only for rdoc purposes
       end
 
       # Retrieves a message from the receiver's subscription, or waits
@@ -101,8 +96,8 @@ module Qpid
       #     end
       #   end
       def fetch(duration = Qpid::Messaging::Duration::FOREVER)
-        message_impl = @receiver_impl.fetch duration.duration_impl
-        create_message_wrapper message_impl unless message_impl.nil?
+        # this method is implemented in native code
+        # and this stub is only for rdoc purposes
       end
 
       # Sets the capacity for this +Receiver+.
@@ -171,12 +166,6 @@ module Qpid
 
       # Returns the Session for this +Receiver+.
       def session; @session; end
-
-      private
-
-      def create_message_wrapper message_impl # :nodoc:
-        Qpid::Messaging::Message.new(:impl => message_impl)
-      end
 
     end
 

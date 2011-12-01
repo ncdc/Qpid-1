@@ -66,9 +66,8 @@ module Qpid
       #   end
       #
       def send(message, args = {}, &block)
-        sync = args[:sync] || false
-        @sender_impl.send message.message_impl, sync
-        block.call message unless block.nil?
+        # this method is implemented as a native extension
+        # and is only here for rdoc purposes
       end
 
       # Closes this +Sender+.

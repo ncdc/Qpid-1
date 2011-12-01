@@ -327,7 +327,7 @@ module Qpid
         if content_type.nil?
           @message_impl.setContent @content
         else
-          Qpid::Messaging.encode @content, self, content_type
+          Cqpid.encode @content, @message_impl
         end
       end
 
@@ -348,12 +348,15 @@ module Qpid
           # decode the content is necessary if it
           # has an encoded content type
           if ["amqp/list", "amqp/map"].include? @message_impl.getContentType
-            @content = Qpid::Messaging.decode(self,
-                                              @message_impl.getContentType)
+            case @message_impl.getContentType
+            when "amqp/map": @content = Cqpid.decodeMap @message_impl
+            when "amqp/list": @content = Cqpid.decodeList @message_impl
+            end
           end
-
         end
+
         @content
+
       end
 
       # Returns the content's size.
