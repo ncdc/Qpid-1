@@ -19,9 +19,12 @@
 
 %{
 
+#include "qpid/messaging/synchio/Acknowledge.h"
 #include "qpid/messaging/synchio/NextReceiver.h"
-#include "qpid/messaging/synchio/Receive.h"
+#include "qpid/messaging/synchio/ReceiverFetch.h"
+#include "qpid/messaging/synchio/ReceiverGet.h"
 #include "qpid/messaging/synchio/Send.h"
+#include "qpid/messaging/synchio/SessionSync.h"
 
 %}
 
@@ -29,9 +32,12 @@
 %include "std_string.i"
 %include "../../swig_ruby_typemaps.i"
 
+%include "qpid/messaging/synchio/Acknowledge.h"
 %include "qpid/messaging/synchio/NextReceiver.h"
-%include "qpid/messaging/synchio/Receive.h"
+%include "qpid/messaging/synchio/ReceiverFetch.h"
+%include "qpid/messaging/synchio/ReceiverGet.h"
 %include "qpid/messaging/synchio/Send.h"
+%include "qpid/messaging/synchio/SessionSync.h"
 
 /* Define the general-purpose exception handling */
 %exception {

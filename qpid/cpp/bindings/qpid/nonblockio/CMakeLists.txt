@@ -23,25 +23,30 @@ set (qpidnonblockio_SOURCES
 
     qpid/messaging/Prong.cpp
     qpid/messaging/Prong.h
-    qpid/messaging/TrackerAdaptor.cpp
-    qpid/messaging/TrackerAdaptor.h
-    qpid/messaging/TrackerAdaptorImpl.cpp
-    qpid/messaging/TrackerAdaptorImpl.h
-    qpid/messaging/TrackerEventHandler.h
-    qpid/messaging/synchio/BaseTrackerEventHandler.cpp
-    qpid/messaging/synchio/BaseTrackerEventHandler.h
+    qpid/messaging/synchio/Acknowledge.cpp
+    qpid/messaging/synchio/Acknowledge.h
+    qpid/messaging/synchio/AcknowledgeImpl.cpp
+    qpid/messaging/synchio/AcknowledgeImpl.h
+    qpid/messaging/synchio/BaseThreadedEventHandler.cpp
+    qpid/messaging/synchio/BaseThreadedEventHandler.h
+    qpid/messaging/synchio/GetOrFetchImpl.cpp
+    qpid/messaging/synchio/GetOrFetchImpl.h
     qpid/messaging/synchio/NextReceiver.cpp
     qpid/messaging/synchio/NextReceiver.h
     qpid/messaging/synchio/NextReceiverImpl.cpp
     qpid/messaging/synchio/NextReceiverImpl.h
-    qpid/messaging/synchio/Receive.cpp
-    qpid/messaging/synchio/Receive.h
-    qpid/messaging/synchio/ReceiveImpl.cpp
-    qpid/messaging/synchio/ReceiveImpl.h
+    qpid/messaging/synchio/ReceiverFetch.cpp
+    qpid/messaging/synchio/ReceiverFetch.h
+    qpid/messaging/synchio/ReceiverGet.cpp
+    qpid/messaging/synchio/ReceiverGet.h
     qpid/messaging/synchio/Send.cpp
     qpid/messaging/synchio/Send.h
     qpid/messaging/synchio/SendImpl.cpp
     qpid/messaging/synchio/SendImpl.h
+    qpid/messaging/synchio/SessionSync.cpp
+    qpid/messaging/synchio/SessionSync.h
+    qpid/messaging/synchio/SessionSyncImpl.cpp
+    qpid/messaging/synchio/SessionSyncImpl.h
 )
 
 add_msvc_version (qpidnonblockio library dll)
