@@ -27,3 +27,9 @@ require 'qpid/session'
 require 'qpid/connection'
 require 'qpid/utils'
 
+begin
+  require 'nonblockio'
+  $QPID_NONBLOCK_IO=true
+rescue Exception => error
+  $QPID_NONBLOCK_IO=false
+end
