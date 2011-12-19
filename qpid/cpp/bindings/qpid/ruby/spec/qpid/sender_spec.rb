@@ -30,6 +30,7 @@ module Qpid
         @message_impl = double("Cqpid::Message")
         @sender_impl  = double("Cqpid::Sender")
         @session      = double("Qpid::Messaging::Session")
+        @send         = double("Cqpid::Send")
 
         @sender = Qpid::Messaging::Sender.new @session, @sender_impl
       end
@@ -40,37 +41,42 @@ module Qpid
         impl.should == @sender_impl
       end
 
-      it "sends a message" do
-        @message.should_receive(:message_impl).
-          and_return(@message_impl)
-        @sender_impl.should_receive(:send).
-          with(@message_impl, false)
+      describe "sends a message" do
 
-        @sender.send @message
-      end
-
-      it "sends a message with optional synch" do
-        @message.should_receive(:message_impl).
-          and_return(@message_impl)
-        @sender_impl.should_receive(:send).
-          with(@message_impl, true)
-
-        @sender.send @message, :sync => true
-      end
-
-      it "sends a message with an optional block" do
-        block_called = false
-
-        @message.should_receive(:message_impl).
-          and_return(@message_impl)
-        @sender_impl.should_receive(:send).
-          with(@message_impl, false)
-
-        @sender.send @message do |message|
-          block_called = true if message == @message
+        before(:each) do
+          Qpid::Messaging::Synchio.should_receive(:create_send_command).
+            with(@sender, @message).
+            and_return(@send)
         end
 
-        block_called.should be_true
+        it "successfully" do
+          @send.should_receive(:getSuccess).
+            and_return(true)
+
+          @sender.send @message
+        end
+
+        it "with optional synch" do
+          @send.should_receive(:getSuccess).
+            and_return(true)
+
+          @sender.send @message, :sync => true
+        end
+
+        it "with an optional block" do
+          block_called = false
+
+          @send.should_receive(:getSuccess).
+            and_return(true)
+
+          @sender.send @message do |message|
+            message.should == @message
+            block_called = true
+          end
+
+          block_called.should be_true
+        end
+
       end
 
       it "closes" do

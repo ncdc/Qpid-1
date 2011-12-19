@@ -29,6 +29,11 @@ module Qpid
         @message_impl  = double("Cqpid::Message")
         @session       = double("Qpid::Messaging::Session")
         @receiver_impl = double("Cqpid::Receiver")
+        @receive       = double("Cqpid::Receive")
+
+        # if we are testing with the non-blocking I/O extensions
+        # then the receiver capacity is set to 1 by default
+        @receiver_impl.should_receive(:setCapacity).with(1) if $QPID_NONBLOCK_IO
 
         @receiver = Qpid::Messaging::Receiver.new @session, @receiver_impl
       end
@@ -39,64 +44,87 @@ module Qpid
         impl.should == @receiver_impl
       end
 
-      it "gets a message with the default duration" do
-        @receiver_impl.should_receive(:get).
-          with(Qpid::Messaging::Duration::FOREVER.duration_impl).
-          and_return(@message_impl)
+      describe "when getting messages" do
 
-        message = @receiver.get
+        before(:each) do
+          Qpid::Messaging::Synchio.should_receive(:create_receiver_get_command).
+            with(@receiver, instance_of(Qpid::Messaging::Duration)).
+            and_return(@receive)
+        end
 
-        message.message_impl.should == @message_impl
+        it "with the default duration" do
+          @receive.should_receive(:getSuccess).
+            and_return(true)
+          @receive.should_receive(:getMessage).
+            and_return(@message_impl)
+
+          message = @receiver.get
+
+          message.message_impl.should == @message_impl
+        end
+
+        it "gets a message with a specified duration" do
+          @receive.should_receive(:getSuccess).
+            and_return(true)
+          @receive.should_receive(:getMessage).
+            and_return(@message_impl)
+
+          message = @receiver.get Qpid::Messaging::Duration::SECOND
+
+          message.message_impl.should == @message_impl
+        end
+
+        it "raises an error when no message is received" do
+          @receive.should_receive(:getSuccess).
+            and_return(false)
+
+          expect {
+            message = @receiver.get Qpid::Messaging::Duration::MINUTE
+          }.to raise_error
+        end
+
       end
 
-      it "gets a message with a specified duration" do
-        @receiver_impl.should_receive(:get).
-          with(Qpid::Messaging::Duration::SECOND.duration_impl).
-          and_return(@message_impl)
+      describe "when fetching messages" do
 
-        message = @receiver.get Qpid::Messaging::Duration::SECOND
+        before(:each) do
+          Qpid::Messaging::Synchio.should_receive(:create_receiver_fetch_command).
+            with(@receiver, instance_of(Qpid::Messaging::Duration)).
+            and_return(@receive)
+        end
 
-        message.message_impl.should == @message_impl
-      end
 
-      it "returns nil when get receives no message" do
-        @receiver_impl.should_receive(:get).
-          with(Qpid::Messaging::Duration::MINUTE.duration_impl).
-          and_return(nil)
+        it "fetches a message with the default duration" do
+          @receive.should_receive(:getSuccess).
+            and_return(true)
+          @receive.should_receive(:getMessage).
+            and_return(@message_impl)
 
-        message = @receiver.get Qpid::Messaging::Duration::MINUTE
+          message = @receiver.fetch
 
-        message.should be_nil
-      end
+          message.message_impl.should == @message_impl
+        end
 
-      it "fetches a message with the default duration" do
-        @receiver_impl.should_receive(:fetch).
-          with(Qpid::Messaging::Duration::FOREVER.duration_impl).
-          and_return(@message_impl)
+        it "fetches a message with a specified duration" do
+          @receive.should_receive(:getSuccess).
+            and_return(true)
+          @receive.should_receive(:getMessage).
+            and_return(@message_impl)
 
-        message = @receiver.fetch
+          message = @receiver.fetch Qpid::Messaging::Duration::SECOND
 
-        message.message_impl.should == @message_impl
-      end
+          message.message_impl.should == @message_impl
+        end
 
-      it "fetches a message with a specified duration" do
-        @receiver_impl.should_receive(:fetch).
-          with(Qpid::Messaging::Duration::SECOND.duration_impl).
-          and_return(@message_impl)
+        it "raise an error when fetch receives no message" do
+          @receive.should_receive(:getSuccess).
+            and_return(false)
 
-        message = @receiver.fetch Qpid::Messaging::Duration::SECOND
+          expect {
+            message = @receiver.fetch Qpid::Messaging::Duration::MINUTE
+          }.to raise_error
+        end
 
-        message.message_impl.should == @message_impl
-      end
-
-      it "returns nil when fetch recieves no message" do
-        @receiver_impl.should_receive(:fetch).
-          with(Qpid::Messaging::Duration::MINUTE.duration_impl).
-          and_return(nil)
-
-        message = @receiver.fetch Qpid::Messaging::Duration::MINUTE
-
-        message.should be_nil
       end
 
       it "assigns capacity" do

@@ -24,5 +24,6 @@ Feature: Receving a message
     Given a sender and receiver for "my-queue;{create:always}"
     And the receiver has a capacity of 1
     And the message "this is a test" is sent
+    And the session is synched
     Then the receiver should have 1 message available
     And the receiver should receive a message with "this is a test"

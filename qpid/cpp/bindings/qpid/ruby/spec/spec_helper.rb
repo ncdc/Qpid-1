@@ -19,3 +19,6 @@
 
 require 'qpid'
 require 'cqpid'
+
+$QPID_TESTING_ENVIRONMENT=true
+

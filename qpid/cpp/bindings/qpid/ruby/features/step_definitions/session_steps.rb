@@ -97,3 +97,7 @@ end
 Then /^the connection for the session is in the (open|closed) state$/ do |state|
   @session.connection.open?.should == false if state == "closed"
 end
+
+Given /^the session is synched$/ do
+  @session.sync
+end

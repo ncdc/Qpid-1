@@ -56,6 +56,6 @@ end
 
 Then /^the receiver should have (\d+) message available$/ do |available|
   # TODO we shouldn't need to sleep a second in order to have this update
-  sleep 1
+  sleep 2
   @receiver.available.should == available.to_i
 end
