@@ -256,8 +256,8 @@ module Qpid
           @message_impl.should_receive(:getContentType).
             twice.
             and_return("amqp/list")
-          Qpid::Messaging.stub!(:decode).
-            with(@message, "amqp/list").
+          Cqpid.should_receive(:decodeList).
+            with(@message_impl).
             and_return(list)
 
           content = @message.content
@@ -273,8 +273,8 @@ module Qpid
           @message_impl.should_receive(:getContentType).
             twice.
             and_return("amqp/map")
-          Qpid::Messaging.stub!(:decode).
-            with(@message, "amqp/map").
+          Cqpid.should_receive(:decodeMap).
+            with(@message_impl).
             and_return(map)
 
           content = @message.content

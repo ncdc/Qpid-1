@@ -5,7 +5,7 @@ end
 Then /^sending the message "([^"]*)" should raise an error$/ do |content|
   lambda {
     steps %Q{
-      Then sending the message "#{content}" succeeds
+      @sender.send Qpid::messaging::Message.new :content => "#{content}"
     }
   }.should raise_error
 end

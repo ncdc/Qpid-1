@@ -31,6 +31,9 @@ module Qpid
         @session       = Qpid::Messaging::Session.new @connection, @session_impl
         @sender_impl   = double("Cqpid::Sender")
         @receiver_impl = double("Cqpid::Receiver")
+        @acknowledge   = double("Cqpid::Acknowledge")
+        @next_receiver = double("Cqpid::NextReceiver")
+        @session_sync  = double("Cqpid::SessionSync")
       end
 
       it "returns its implementation" do
@@ -113,6 +116,7 @@ module Qpid
           and_return(@receiver_impl)
         @receiver_impl.should_receive(:getName).
           and_return("my-queue")
+        @receiver_impl.should_receive(:setCapacity).with(1) if $QPID_NONBLOCK_IO
 
         receiver = @session.create_receiver address
 
@@ -127,6 +131,7 @@ module Qpid
           and_return(@receiver_impl)
         @receiver_impl.should_receive(:getName).
           and_return("my-queue")
+        @receiver_impl.should_receive(:setCapacity).with(1) if $QPID_NONBLOCK_IO
 
         receiver = @session.create_receiver address
 
@@ -147,6 +152,7 @@ module Qpid
             and_return(@receiver_impl)
           @receiver_impl.should_receive(:getName).
             and_return(@name)
+          @receiver_impl.should_receive(:setCapacity).with(1) if $QPID_NONBLOCK_IO
 
           @receiver = @session.create_receiver address
         end
@@ -191,8 +197,11 @@ module Qpid
       end
 
       it "acknowledges all messages synchronously" do
-        @session_impl.should_receive(:acknowledge).
-          with(true)
+        Qpid::Messaging::Synchio.should_receive(:create_acknowledge_command).
+          with(@session, nil).
+          and_return(@acknowledge)
+        @acknowledge.should_receive(:getSuccess).
+          and_return(true)
 
         @session.acknowledge :sync => true
       end
@@ -221,8 +230,11 @@ module Qpid
         end
 
         it "can acknowledge synchronously" do
-          @session_impl.should_receive(:acknowledge).
-            with(@message.message_impl, true)
+          Qpid::Messaging::Synchio.should_receive(:create_acknowledge_command).
+            with(@session, @message).
+            and_return(@acknowledge)
+          @acknowledge.should_receive(:getSuccess).
+            and_return(true)
 
           @session.acknowledge :message => @message, :sync => true
         end
@@ -258,8 +270,11 @@ module Qpid
       end
 
       it "can block while synchronizing with the broker" do
-        @session_impl.should_receive(:sync).
-          with(true)
+        Qpid::Messaging::Synchio.should_receive(:create_sync_command).
+          with(@session).
+          and_return(@session_sync)
+        @session_sync.should_receive(:getSuccess).
+          and_return(true)
 
         @session.sync :block => true
       end
@@ -289,34 +304,50 @@ module Qpid
         unsettled.should == 25
       end
 
-      it "waits forever by default for the next Receiver with messages" do
-        @session_impl.should_receive(:nextReceiver).
-          with(Qpid::Messaging::Duration::FOREVER.duration_impl).
-          and_return(@receiver_impl)
+      ################################
+      # when getting the next receiver
+      ################################
+      describe "getting the next Receiver with messages" do
 
-        receiver = @session.next_receiver
+        before(:each) do
+          Qpid::Messaging::Synchio.should_receive(:create_next_receiver_command).
+            with(@session, instance_of(Qpid::Messaging::Duration)).
+            and_return(@next_receiver)
+        end
 
-        receiver.receiver_impl.should == @receiver_impl
-      end
+        it "waits forever by default" do
+          @next_receiver.should_receive(:getSuccess).
+            and_return(true)
+          @next_receiver.should_receive(:getReceiver).
+            and_return(@receiver_impl)
+          @receiver_impl.should_receive(:setCapacity).with(1) if $QPID_NONBLOCK_IO
 
-      it "uses the specified time when waiting for the next Receiver with messages" do
-        @session_impl.should_receive(:nextReceiver).
-          with(Qpid::Messaging::Duration::SECOND.duration_impl).
-          and_return(@receiver_impl)
+          receiver = @session.next_receiver
 
-        receiver = @session.next_receiver Qpid::Messaging::Duration::SECOND
+          receiver.receiver_impl.should == @receiver_impl
+        end
 
-        receiver.receiver_impl.should == @receiver_impl
-      end
+        it "uses the specified time" do
+          @next_receiver.should_receive(:getSuccess).
+            and_return(true)
+          @next_receiver.should_receive(:getReceiver).
+            and_return(@receiver_impl)
+          @receiver_impl.should_receive(:setCapacity).with(1) if $QPID_NONBLOCK_IO
 
-      it "returns nil when no Receiver has messages within the timeout period" do
-        @session_impl.should_receive(:nextReceiver).
-          with(Qpid::Messaging::Duration::MINUTE.duration_impl).
-          and_return(nil)
+          receiver = @session.next_receiver Qpid::Messaging::Duration::SECOND
 
-        receiver = @session.next_receiver Qpid::Messaging::Duration::MINUTE
+          receiver.receiver_impl.should == @receiver_impl
+        end
 
-        receiver.should be_nil
+        it "returns nil when no Receiver has messages within the timeout period" do
+          @next_receiver.should_receive(:getSuccess).
+            and_return(false)
+
+          receiver = @session.next_receiver Qpid::Messaging::Duration::MINUTE
+
+          receiver.should be_nil
+        end
+
       end
 
       it "returns true when there are errors on the session" do
