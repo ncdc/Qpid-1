@@ -29,11 +29,13 @@ set(GEM_OUTPUT_FILE ${GEM_OUTPUT_PATH}/pkg/qpid-${qpidc_version}.0.gem)
 ##------------------------------------------------------
 ## Use Swig to generate a literal binding to the C++ API
 ##------------------------------------------------------
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/../nonblockio)
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR}/../../../include)
 set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/ruby.i PROPERTIES CPLUSPLUS ON)
 set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/ruby.i PROPERTIES SWIG_FLAGS "-I${qpid-cpp_SOURCE_DIR}/include")
 
 swig_add_module(cqpid_ruby ruby ${CMAKE_CURRENT_SOURCE_DIR}/ruby.i)
-swig_link_libraries(cqpid_ruby qpidmessaging qpidtypes qmf2 ${RUBY_LIBRARY})
+swig_link_libraries(cqpid_ruby qpidnonblockio qpidmessaging qpidtypes qmf2 ${RUBY_LIBRARY})
 
 set_source_files_properties(${swig_generated_file_fullname} PROPERTIES COMPILE_FLAGS "-fno-strict-aliasing -I${RUBY_INCLUDE_DIR} -I${qpid-cpp_SOURCE_DIR}/include")
 

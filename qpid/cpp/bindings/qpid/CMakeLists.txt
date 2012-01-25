@@ -33,6 +33,7 @@ if (SWIG_FOUND)
 
     if (RUBY_FOUND)
         add_subdirectory(ruby)
+        add_subdirectory(nonblockio)
     endif (RUBY_FOUND)
 
     if (PERLLIBS_FOUND)

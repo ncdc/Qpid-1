@@ -17,9 +17,21 @@
  * under the License.
  */
 
+%{
+
+#include "qpid/messaging/synchio/NextReceiver.h"
+#include "qpid/messaging/synchio/Receive.h"
+#include "qpid/messaging/synchio/Send.h"
+
+%}
+
 %module cqpid
 %include "std_string.i"
 %include "../../swig_ruby_typemaps.i"
+
+%include "qpid/messaging/synchio/NextReceiver.h"
+%include "qpid/messaging/synchio/Receive.h"
+%include "qpid/messaging/synchio/Send.h"
 
 /* Define the general-purpose exception handling */
 %exception {
