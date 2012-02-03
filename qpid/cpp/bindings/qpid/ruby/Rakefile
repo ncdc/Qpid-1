@@ -125,7 +125,9 @@ spec = Gem::Specification.new do |s|
                                "lib/**/*.rb",
                                "test/**/*.rb",
                                "examples/**/*.rb",
-                               "ext/**/*",
+                               "ext/**/*.c",
+                               "ext/**/*.cpp",
+                               "ext/**/*.h",
                                "features/**/*",
                                "spec/**/*"]
 end
@@ -138,5 +140,4 @@ end
 # Build native code
 #------------------
 
-Rake::ExtensionTask.new("cqpid", spec)
-
+Rake::ExtensionTask.new("nonblockio", spec)
