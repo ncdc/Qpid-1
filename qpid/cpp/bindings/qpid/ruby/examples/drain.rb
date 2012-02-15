@@ -89,8 +89,16 @@ begin
   count = 0
   options[:timeout] = Qpid::Messaging::Duration::FOREVER if options[:forever]
 
-  while !done && (count < options[:count])
-    message = receiver.fetch(options[:timeout])
+  loop do
+    # if we don't sleep even for a split second then messages aren't properly seen
+    sleep 0.1
+    break if receiver.available == 0
+    begin
+      message = receiver.fetch(options[:timeout])
+    rescue Exception
+      break
+    end
+
     print "Message(properties="
     render_map message.properties
     print ", content="
