@@ -93,7 +93,6 @@ Rake::RDocTask.new(:rdoc => "rdoc",
                    :clobber_rdoc => "rdoc:clean",
                    :rerdoc => "rdoc:force") do |rd|
   rd.main    = "README.rdoc"
-  rd.options << "--all"
   rd.rdoc_files.include("README.rdoc",
                         "lib/**/*.rb",
                         "ext/**/*.c")

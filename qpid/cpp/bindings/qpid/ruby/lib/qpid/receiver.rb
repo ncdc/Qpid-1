@@ -32,9 +32,9 @@ module Qpid
     #
     # ==== Example
     #
-    #   conn     = Qpid::Messaging::Connection.new :url => "mybroker:5762"
+    #   conn = Qpid::Messaging::Connection.new :url => "mybroker:5762"
     #   conn.open
-    #   session  = conn.create_session
+    #   session = conn.create_session
     #   receiver = session.create_receiver "my-sender-queue"
     class Receiver
 
@@ -100,7 +100,7 @@ module Qpid
         # and this stub is only for rdoc purposes
       end
 
-      # Sets the capacity for this +Receiver+.
+      # Sets the capacity.
       #
       # ==== Options
       #
@@ -144,7 +144,7 @@ module Qpid
       #
       def unsettled; @receiver_impl.getUnsettled; end
 
-      # Closes this +Receiver+.
+      # Closes this receiver.
       #
       # This does not affect the +Session+.
       def close; @receiver_impl.close; end
@@ -157,14 +157,14 @@ module Qpid
       #
       def closed?; @receiver_impl.isClosed; end
 
-      # Returns the name of this +Receiver+.
+      # Returns the name.
       #
       # ==== Examples
       #
       #   puts "Receiver: #{recv.name}"
       def name; @receiver_impl.getName; end
 
-      # Returns the Session for this +Receiver+.
+      # Returns the Session.
       def session; @session; end
 
     end
