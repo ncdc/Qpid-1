@@ -25,8 +25,8 @@ If you are building the gem within the Qpid development environment
 itself, you can specify the location of the Qpid headers and
 libraries with:
 
-$ ruby extconfig.rb --with-qpid-lib=[path to libqpidclient.so, etc.]
-$ make
+  $ ruby extconfig.rb --with-qpid-lib=PATH TO LIBS] [--with-qpid-include=PATH TO HEADERS]
+  $ make
 
 == Examples
 
@@ -38,8 +38,8 @@ the messaging capabilities of Qpid in your Ruby applications.
 Licensed to the Apache Software Foundation (ASF) under one or more
 contributor licensing agreements.
 
-Author:: Darryl L. Pierce (mailto:dpierce@redhat.com)
-Copyright:: Copyright (c) 2011, Red Hat, Inc.
-Homepage:: http://qpid.apache.org
-License:: Apache License 2.0 - http://www.apache.org/licenses/LICENSE-2.0.html
+Author::    Darryl L. Pierce (mailto:dpierce@redhat.com)
+Copyright:: Copyright (c) 2011,2012 Red Hat, Inc.
+Homepage::  http://qpid.apache.org
+License::   Apache License 2.0 - http://www.apache.org/licenses/LICENSE-2.0.html
 
