@@ -118,6 +118,8 @@ options[:properties].each_key {|key| message.properties[key] = options[:properti
   message.properties["spout-id"] = "#{count}"
   message.reply_to = options[:replyto] unless options[:replyto].nil? || options[:replyto].empty?
   sender.send message
+  # if we don't sleep then there are problems sending a load of messages at once
+  sleep 0.1 if count > 1
 end
 
 # session.sync
