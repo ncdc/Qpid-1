@@ -29,7 +29,7 @@ module Qpid
     #
     class Message
 
-      # Creates a new instance of +Message+.
+      # Creates a new instance.
       #
       # ==== Options
       #
@@ -51,7 +51,7 @@ module Qpid
         @message_impl
       end
 
-      # Sets the address to which replies should be sent for the +Message+.
+      # Sets the address to which replies should be sent.
       #
       # *NOTE:* The address must be an instance of Address.
       #
@@ -68,7 +68,7 @@ module Qpid
         @message_impl.setReplyTo address.address_impl
       end
 
-      # Returns the reply to address for the +Message+.
+      # Returns the reply to address.
       #
       def reply_to
         address_impl = @message_impl.getReplyTo
@@ -76,7 +76,7 @@ module Qpid
         Qpid::Messaging::Address.new(nil, nil, nil, nil, address_impl) if address_impl
       end
 
-      # Sets the subject for the +Message+.
+      # Sets the subject.
       #
       # ==== Options
       #
@@ -88,7 +88,7 @@ module Qpid
       #
       def subject=(subject); @message_impl.setSubject subject; end
 
-      # Returns the subject of the +Message+.
+      # Returns the subject.
       #
       # ==== Options
       #
@@ -96,7 +96,7 @@ module Qpid
       #
       def subject; @message_impl.getSubject; end
 
-      # Sets the content type for the +Message+.
+      # Sets the content type.
       #
       # This should be set by the sending applicaton and indicates to
       # recipients of the message how to interpret or decode the content.
@@ -111,7 +111,7 @@ module Qpid
       #
       def content_type=(content_type); @message_impl.setContentType content_type; end
 
-      # Returns the content type for the +Message+.
+      # Returns the content type.
       #
       # ==== Examples
       #
@@ -145,7 +145,7 @@ module Qpid
       # See +message_id=+ for details.
       def message_id; @message_impl.getMessageId; end
 
-      # Sets the user id for the +Message+.
+      # Sets the user id.
       #
       # This should in general be the user-id which was used when authenticating
       # the connection itself, as the messaging infrastructure will verify
@@ -162,13 +162,13 @@ module Qpid
       #
       def user_id=(user_id); @message_impl.setUserId user_id; end
 
-      # Returns the user id for the +Message+.
+      # Returns the user id.
       #
       # See +user_id=+ for details.
       #
       def user_id; @message_impl.getUserId; end
 
-      # Sets the correlation id of the +Message+.
+      # Sets the correlation id.
       #
       # The correlation id can be used as part of a protocol for message
       # exchange patterns; e.g., a requestion-response pattern might require
@@ -185,13 +185,13 @@ module Qpid
       #
       def correlation_id=(correlation_id); @message_impl.setCorrelationId correlation_id; end
 
-      # Returns the correlation id of the +Message+.
+      # Returns the correlation id.
       #
       # *NOTE:* See +correlation_id=+ for details.
       #
       def correlation_id; @message_impl.getCorrelationId; end
 
-      # Sets the priority of the +Message+.
+      # Sets the priority.
       #
       # This may be used by the messaging infrastructure to prioritize
       # delivery of messages with higher priority.
@@ -206,7 +206,7 @@ module Qpid
       #
       def priority=(priority); @message_impl.setPriority priority; end
 
-      # Returns the priority for the +Message+.
+      # Returns the priority.
       #
       def priority; @message_impl.getPriority; end
 
@@ -227,7 +227,7 @@ module Qpid
       # Returns the time-to-live in milliseconds.
       def ttl; Qpid::Messaging::Duration.new @message_impl.getTtl.getMilliseconds; end
 
-      # Sets the durability of the +Message+.
+      # Sets the durability.
       #
       # This is a hint to the messaging infrastructure that the message
       # should be persisted or otherwise stored. This helps to ensure
@@ -239,7 +239,7 @@ module Qpid
       #
       def durable=(durable); @message_impl.setDurable durable; end
 
-      # Returns the durability for the +Message+.
+      # Returns the durability.
       #
       def durable; @message_impl.getDurable; end
 
@@ -258,7 +258,7 @@ module Qpid
       #
       def redelivered=(redelivered); @message_impl.setRedelivered redelivered; end
 
-      # Returns whether the +Message+ has been marked as redelivered.
+      # Returns true if marked as redelivered.
       #
       def redelivered; @message_impl.getRedelivered; end
 
@@ -283,22 +283,23 @@ module Qpid
       #
       def [](key); self.properties[key.to_s]; end
 
-      # Assigns a value to the named property.
+      # Assigns the specified value to the named property.
       #
-      # *NOTE:* Both the key or the value may be a symbol, but they will
-      # both be converted to a +String+ for ease of transport.
+      # *NOTE:* If either the key or the value are *symbol*, they will
+      # be converted to a +String+ for ease of transport.
       #
       # ==== Options
       #
       # * name - the property name
       # * value - the property value
+      #
       def []=(key, value); @message_impl.setProperty(key.to_s, value.to_s); end
 
-      # Sets the content for the +Message+.
+      # Sets the content.
       #
       # Content is automatically encoded for Array and Hash types. Other types
-      # need to set their own content types (via +content_type+) in order to
-      # specify how recipients should process the content.
+      # need to set their own content types in order to specify how recipients
+      # should process the content.
       #
       # ==== Options
       #
@@ -331,11 +332,11 @@ module Qpid
         end
       end
 
-      # Returns the content of the +Message+.
+      # Returns the content.
       #
       # Content is automatically decoded based on the specified content type.
       # If the content type is application-specific, then no decoding is
-      # performed and the content is returnedas a +String+ representation.
+      # performed and the content is returned as a +String+ representation.
       #
       # For example, if an array of integers are sent, then the receiver will
       # find the message content to be an array of String objects, where each

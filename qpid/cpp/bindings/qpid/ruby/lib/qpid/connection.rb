@@ -84,7 +84,7 @@ module Qpid
         @connection_impl.open
       end
 
-      # Reports whether the connection is open.
+      # Returns true if the connection is open.
       #
       # ==== Examples
       #
@@ -121,7 +121,7 @@ module Qpid
         end
       end
 
-      # Returns a session for the specified session name.
+      # Returns the session for the specified session name.
       #
       # ==== Examples
       #

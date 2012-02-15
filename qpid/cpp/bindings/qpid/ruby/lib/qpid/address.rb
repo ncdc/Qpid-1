@@ -44,7 +44,7 @@ module Qpid
     #
     # [:create]
     #   Indicates if the address should be created; values are *always*,
-    #   *never*, *sender* or *reciever*.
+    #   *never*, *sender* or *receiver*.
     #
     # [:assert]
     #   Indicates whether or not to assert any specified node properties;
@@ -67,7 +67,7 @@ module Qpid
     #   and *x-bindings*.
     #
     # [:mode]
-    #   (*For receivers only*) indicates whether the receiver should consume
+    #   (FOR RECEIVERS ONLY) Indicates whether the receiver should consume
     #   or browse messages; values are *consume* (the default) and *browse*.
     #
     class Address

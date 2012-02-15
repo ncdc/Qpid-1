@@ -70,12 +70,12 @@ module Qpid
         # and is only here for rdoc purposes
       end
 
-      # Closes this +Sender+.
+      # Closes the sender.
       #
       # This does not affect the +Session+.
       def close; @sender_impl.close; end
 
-      # Returns the human-readable name for this +Sender+.
+      # Returns the human-readable name.
       #
       # ==== Examples
       #
@@ -83,7 +83,7 @@ module Qpid
       #
       def name; @sender_impl.getName; end
 
-      # Sets the capacity for this +Sender+.
+      # Sets the capacity.
       #
       # The capacity is the number of outgoing messages that can be held
       # pending confirmation or receipt by the broker.

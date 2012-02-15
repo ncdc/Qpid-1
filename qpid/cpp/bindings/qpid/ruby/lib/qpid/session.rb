@@ -46,7 +46,7 @@ module Qpid
 
       # Creates a new endpoint for sending messages.
       #
-      # The +address+ can either be an instance +Address+ or else a
+      # The +address+ can either be an instance of +Address+ or else a
       # string that describes an address endpoint.
       #
       # ==== Arguments
@@ -93,7 +93,7 @@ module Qpid
 
       # Creates a new endpoint for receiving messages.
       #
-      # The +address+ can either be an instance +Address+ or else a
+      # The +address+ can either be an instance of +Address+ or else a
       # string that describes an address endpoint.
       #
       # ==== Arguments
@@ -141,7 +141,7 @@ module Qpid
         @receivers[name]
       end
 
-      # Closes the +Session+ and all associated +Sender+ and +Receiver+ instances.
+      # Closes the session and all associated +Sender+ and +Receiver+ instances.
       #
       # NOTE: All +Session+ instances for a +Connection+ are closed when the
       # +Connection+ is closed.
@@ -217,7 +217,7 @@ module Qpid
       end
 
       # Returns the total number of receivable messages, and messages already
-      # received, by +Receiver+ instances associated with this +Session+.
+      # received, by +Receiver+ instances associated with this session.
       def receivable; @session_impl.getReceivable; end
 
       # Returns the number of messages that have been acknowledged by this session
@@ -250,7 +250,7 @@ module Qpid
       #   puts "There were session errors." if @session.errors?
       def errors?; @session_impl.hasError; end
 
-      # If the +Session+ has been rendered invalid due to some exception,
+      # If the session has been rendered invalid due to some exception,
       # this method will result in that exception being raised.
       #
       # If none have occurred, then no exceptions are raised.
