@@ -17,7 +17,7 @@
 # under the License.
 #
 
-SUBDIRS = dotnet
+SUBDIRS = dotnet nonblockio
 
 if HAVE_SWIG
 

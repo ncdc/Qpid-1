@@ -562,6 +562,7 @@ AC_CONFIG_FILES([
   bindings/qpid/python/Makefile
   bindings/qpid/perl/Makefile.PL
   bindings/qpid/dotnet/Makefile
+  bindings/qpid/nonblockio/Makefile
   bindings/qmf/Makefile
   bindings/qmf/ruby/Makefile
   bindings/qmf/python/Makefile
