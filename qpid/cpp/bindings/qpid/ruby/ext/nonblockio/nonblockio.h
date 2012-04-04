@@ -37,6 +37,8 @@ extern VALUE cSender;
 extern VALUE cSession;
 extern VALUE eMessagingError;
 
+#define KLASS(x) RSTRING_PTR(rb_funcall(rb_funcall(x, rb_intern("class"), 0), rb_intern("to_s"), 0))
+
 
 // Utility methods
 VALUE qpid_is_main_thread();

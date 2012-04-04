@@ -82,6 +82,46 @@ static VALUE qpid_receive(VALUE receiver, VALUE timeout,
 }
 
 
+VALUE qpid_ruby19_threaded_receive(void* void_args)
+{
+  VALUE* args     = (void*)void_args;
+  VALUE  result   = Qnil;
+  VALUE  receiver = args[0];
+  VALUE  timeout  = args[1];
+  VALUE  method   = args[2];
+
+  VALUE duration_impl = rb_funcall(timeout, rb_intern("duration_impl"), 0);
+  VALUE receiver_impl = rb_funcall(receiver, rb_intern("receiver_impl"), 0);
+
+  VALUE receiver_args[1];
+
+  receiver_args[0] = duration_impl;
+  VALUE message    = rb_funcall(receiver_impl, method, 0); // 1, receiver_args);
+
+  if(RTEST(message))
+    {
+      ID    message_class_id;
+      VALUE message_class;
+      VALUE message_args[1];
+
+      message_class_id = rb_intern("Message");
+      message_class    = rb_const_get(mMessaging, message_class_id);
+      message_args[0]  = rb_hash_new();
+      rb_hash_aset(message_args[0], ID2SYM(rb_intern("impl")), message);
+      result           = rb_class_new_instance(1, message_args,
+                                               message_class);
+    }
+
+  return result;
+}
+
+
+void qpid_ruby19_threaded_receive_interrupt()
+{
+  printf("THREAD INTERRUPT CALLED!\n");
+}
+
+
 static VALUE qpid_receiver_get_or_fetch(int argc, VALUE* argv, VALUE self,
                                         char* method, char* utils_method)
 {
@@ -104,7 +144,16 @@ static VALUE qpid_receiver_get_or_fetch(int argc, VALUE* argv, VALUE self,
       timeout = qpid_get_duration_by_name(ID2SYM(rb_intern("FOREVER")));
     }
 
-  result = qpid_receive(self, timeout, method, utils_method);
+  // result = qpid_receive(self, timeout, method, utils_method);
+  VALUE args[4];
+
+  args[0] = self;
+  args[1] = timeout;
+  args[2] = rb_intern(method);
+  args[3] = rb_intern(utils_method);
+
+  result = rb_thread_blocking_region(qpid_ruby19_threaded_receive, &args,
+                                     qpid_ruby19_threaded_receive_interrupt, 4);
 
   return result;
 }
