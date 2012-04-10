@@ -34,11 +34,33 @@
 #define ERROR_MESSAGE_LEN 1024
 
 
-static VALUE qpid_receive(VALUE receiver, VALUE timeout,
-                          char* method, char* utils_method)
+#ifdef RUBY19
+static VALUE qpid_threaded_receive(void* void_args)
 {
-  VALUE receive_object;
+  VALUE* args     = (void*)void_args;
+  VALUE  result   = Qnil;
+  VALUE  receiver = args[0];
+  VALUE  timeout  = args[1];
+  VALUE  method   = args[2];
+
+  VALUE duration_impl = rb_funcall(timeout, rb_intern("duration_impl"), 0);
+  VALUE receiver_impl = rb_funcall(receiver, rb_intern("receiver_impl"), 0);
+
+  result = rb_funcall(receiver_impl, method, 1, duration_impl);
+
+  return result;
+
+}
+#endif
+
+
+static VALUE qpid_receive(VALUE receiver, VALUE timeout,
+                          const char* method, const char* utils_method)
+{
   VALUE result = Qnil;
+
+#ifdef RUBY18
+  VALUE receive_object;
 
   // create the receive action
   receive_object   = rb_funcall(mSynchio, rb_intern(utils_method),
@@ -66,6 +88,32 @@ static VALUE qpid_receive(VALUE receiver, VALUE timeout,
                                                    message_class);
         }
     }
+#elif RUBY19
+  // call get or fetch from a blocking region
+  VALUE args[3];
+
+  args[0] = receiver;
+  args[1] = timeout;
+  args[2] = rb_intern(method);
+
+  VALUE message = rb_thread_blocking_region(qpid_threaded_receive, &args,
+                                            RUBY_UBF_PROCESS, NULL);
+
+  if(RTEST(message))
+    {
+      ID    message_class_id;
+      VALUE message_class;
+      VALUE message_args[1];
+
+      message_class_id = rb_intern("Message");
+      message_class    = rb_const_get(mMessaging, message_class_id);
+      message_args[0]  = rb_hash_new();
+      rb_hash_aset(message_args[0], ID2SYM(rb_intern("impl")), message);
+      result           = rb_class_new_instance(1, message_args,
+                                               message_class);
+    }
+
+#endif
 
   // if we did not receive a message, then raise an error
   if(result == Qnil)
@@ -83,7 +131,7 @@ static VALUE qpid_receive(VALUE receiver, VALUE timeout,
 
 
 static VALUE qpid_receiver_get_or_fetch(int argc, VALUE* argv, VALUE self,
-                                        char* method, char* utils_method)
+                                        const char* method, const char* utils_method)
 {
   VALUE result;
   VALUE timeout = Qnil;

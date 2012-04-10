@@ -37,6 +37,23 @@ static VALUE qpid_wait_on_send(VALUE* args)
 }
 
 
+#ifdef RUBY19
+static VALUE qpid_threaded_send(void* void_args)
+{
+  VALUE* args         = (VALUE*)void_args;
+  VALUE  sender       = args[0];
+  VALUE  message      = args[1];
+  VALUE  sync         = args[2];
+  VALUE  sender_impl  = rb_funcall(sender, rb_intern("sender_impl"), 0);
+  VALUE  message_impl = rb_funcall(message, rb_intern("message_impl"), 0);
+
+  rb_funcall(sender_impl, rb_intern("send"), 2, message_impl, sync);
+
+  return message;
+}
+#endif
+
+
 VALUE qpid_sender_send(int argc, VALUE* argv, VALUE self)
 {
   VALUE sender = self;
@@ -64,10 +81,22 @@ VALUE qpid_sender_send(int argc, VALUE* argv, VALUE self)
 
   if(sync == Qnil) sync = Qfalse;
 
+#ifdef RUBY18
   send_object = rb_funcall(mSynchio, rb_intern("create_send_command"),
                            2, sender, message);
 
   VALUE success = qpid_wait_on_command(send_object);
+#else
+  VALUE args[3];
+  VALUE success = Qtrue;
+
+  args[0] = sender;
+  args[1] = message;
+  args[2] = sync;
+
+  rb_thread_blocking_region(qpid_threaded_send, &args,
+                            RUBY_UBF_PROCESS, 0);
+#endif
 
   if(rb_block_given_p())
     {

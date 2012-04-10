@@ -33,6 +33,7 @@
 #define IN_BUFFER_SIZE 4096
 #define ERROR_MESSAGE_LEN 1024
 
+#ifdef RUBY18
 static VALUE qpid_wait_on_next_receiver(VALUE* args)
 {
   VALUE next_receiver_object = args[0];
@@ -48,6 +49,7 @@ static VALUE qpid_wait_on_next_receiver(VALUE* args)
 
   return Qnil;
 }
+#endif
 
 
 VALUE qpid_session_acknowledge_with_synch(VALUE self, VALUE message)
@@ -63,6 +65,22 @@ VALUE qpid_session_acknowledge_with_synch(VALUE self, VALUE message)
 
   return result;
 }
+
+
+#ifdef RUBY19
+static VALUE qpid_threaded_next_receiver(void* void_args)
+{
+  VALUE* args         = (VALUE*)void_args;
+  VALUE self          = args[0];
+  VALUE timeout       = args[1];
+  VALUE duration_impl = rb_funcall(timeout, rb_intern("duration_impl"), 0);
+  VALUE session_impl  = rb_funcall(self, rb_intern("session_impl"), 0);
+  VALUE result        = rb_funcall(session_impl, rb_intern("nextReceiver"),
+                                   1, duration_impl);
+
+  return result;
+}
+#endif
 
 
 VALUE qpid_session_next_receiver(int argc, VALUE* argv, VALUE self)
@@ -81,6 +99,9 @@ VALUE qpid_session_next_receiver(int argc, VALUE* argv, VALUE self)
       timeout = qpid_get_duration_by_name(ID2SYM(rb_intern("FOREVER")));
     }
 
+  VALUE receiver_impl = Qnil;
+
+#ifdef RUBY18
   next_receiver = rb_funcall(mSynchio, rb_intern("create_next_receiver_command"),
                              2, session, timeout);
 
@@ -88,20 +109,30 @@ VALUE qpid_session_next_receiver(int argc, VALUE* argv, VALUE self)
 
   if(RTEST(success))
     {
-      VALUE receiver_impl = rb_funcall(next_receiver, rb_intern("getReceiver"), 0);
+      receiver_impl = rb_funcall(next_receiver, rb_intern("getReceiver"), 0);
+    }
 
-      if(RTEST(receiver_impl))
-        {
-          ID    receiver_class_id;
-          VALUE receiver_class;
-          VALUE receiver_args[2];
+#else
+  VALUE args[2];
 
-          receiver_class_id = rb_intern("Receiver");
-          receiver_class    = rb_const_get(mMessaging, receiver_class_id);
-          receiver_args[0]  = self;
-          receiver_args[1]  = receiver_impl;
-          result           = rb_class_new_instance(2, receiver_args, receiver_class);
-        }
+  args[0] = self;
+  args[1] = timeout;
+
+  receiver_impl = rb_thread_blocking_region(qpid_threaded_next_receiver, &args,
+                                            RUBY_UBF_PROCESS, NULL);
+#endif
+
+  if(RTEST(receiver_impl))
+    {
+      ID    receiver_class_id;
+      VALUE receiver_class;
+      VALUE receiver_args[2];
+
+      receiver_class_id = rb_intern("Receiver");
+      receiver_class    = rb_const_get(mMessaging, receiver_class_id);
+      receiver_args[0]  = self;
+      receiver_args[1]  = receiver_impl;
+      result           = rb_class_new_instance(2, receiver_args, receiver_class);
     }
 
   if(rb_block_given_p())
@@ -112,13 +143,35 @@ VALUE qpid_session_next_receiver(int argc, VALUE* argv, VALUE self)
   return result;
 }
 
+#ifdef RUBY19
+static VALUE qpid_threaded_sync_and_block(void* void_args)
+{
+  VALUE* args        = (VALUE*)void_args;
+  VALUE self         = args[0];
+  VALUE session_impl = rb_funcall(self, rb_intern("session_impl"), 0);
+
+  rb_funcall(session_impl, rb_intern("sync"), 1, Qtrue);
+
+  return Qnil;
+}
+#endif
+
 VALUE qpid_session_sync_and_block(VALUE self)
 {
   VALUE session = self;
+
+#ifdef RUBY18
   VALUE sync = rb_funcall(mSynchio, rb_intern("create_sync_command"),
                           1, session);
 
   qpid_wait_on_command(sync);
+#else
+  VALUE args[1];
+
+  args[1] = self;
+  rb_thread_blocking_region(qpid_threaded_sync_and_block, &args,
+                            RUBY_UBF_PROCESS, NULL);
+#endif
 
   return Qnil;
 }

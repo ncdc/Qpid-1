@@ -25,7 +25,12 @@
  */
 
 #include <ruby.h>
+
+#ifdef RUBY18
 #include <rubyio.h>
+#else
+#include <ruby/io.h>
+#endif
 
 extern VALUE mCqpid;
 extern VALUE mQpid;
