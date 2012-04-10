@@ -25,5 +25,10 @@
 
 require 'mkmf'
 
+# specify the version of Ruby being used as a macro: RUBY##
+runtime_version = RbConfig::CONFIG["ruby_version"].gsub(/\./, "")[0, 2]
+
+$CPPFLAGS += " -DRUBY#{runtime_version}"
+
 create_makefile('nonblockio')
 
