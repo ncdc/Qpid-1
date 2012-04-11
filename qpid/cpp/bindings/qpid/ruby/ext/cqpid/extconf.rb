@@ -26,7 +26,7 @@
 require 'mkmf'
 
 # Setup the build environment.
-$CFLAGS = "-fPIC -fno-inline -x c++"
+$CFLAGS = "-fPIC -fno-inline -x c++ -Wl,-soname,qpid"
 
 REQUIRED_LIBRARIES = [
                       'qpidclient',
