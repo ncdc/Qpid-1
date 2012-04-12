@@ -47,16 +47,24 @@ module Qpid
       describe "when getting messages" do
 
         before(:each) do
-          Qpid::Messaging::Synchio.should_receive(:create_receiver_get_command).
-            with(@receiver, instance_of(Qpid::Messaging::Duration)).
-            and_return(@receive)
+          if $RUBY_VERSION == "1.8"
+            Qpid::Messaging::Synchio.should_receive(:create_receiver_get_command).
+              with(@receiver, instance_of(Qpid::Messaging::Duration)).
+              and_return(@receive)
+          end
         end
 
         it "with the default duration" do
-          @receive.should_receive(:getSuccess).
-            and_return(true)
-          @receive.should_receive(:getMessage).
-            and_return(@message_impl)
+          if $RUBY_VERSION == "1.8"
+            @receive.should_receive(:getSuccess).
+              and_return(true)
+            @receive.should_receive(:getMessage).
+              and_return(@message_impl)
+          else
+            @receiver_impl.should_receive(:get).
+              with(Qpid::Messaging::Duration::FOREVER.duration_impl).
+              and_return(@message_impl)
+          end
 
           message = @receiver.get
 
@@ -64,10 +72,16 @@ module Qpid
         end
 
         it "gets a message with a specified duration" do
-          @receive.should_receive(:getSuccess).
-            and_return(true)
-          @receive.should_receive(:getMessage).
-            and_return(@message_impl)
+          if $RUBY_VERSION == "1.8"
+            @receive.should_receive(:getSuccess).
+              and_return(true)
+            @receive.should_receive(:getMessage).
+              and_return(@message_impl)
+          else
+            @receiver_impl.should_receive(:get).
+              with(Qpid::Messaging::Duration::SECOND.duration_impl).
+              and_return(@message_impl)
+          end
 
           message = @receiver.get Qpid::Messaging::Duration::SECOND
 
@@ -75,8 +89,14 @@ module Qpid
         end
 
         it "raises an error when no message is received" do
-          @receive.should_receive(:getSuccess).
-            and_return(false)
+          if $RUBY_VERSION == "1.8"
+            @receive.should_receive(:getSuccess).
+              and_return(false)
+          else
+            @receiver_impl.should_receive(:get).
+              with(instance_of(Cqpid::Duration)).
+              and_raise(MessagingError)
+          end
 
           expect {
             message = @receiver.get Qpid::Messaging::Duration::MINUTE
@@ -88,17 +108,25 @@ module Qpid
       describe "when fetching messages" do
 
         before(:each) do
-          Qpid::Messaging::Synchio.should_receive(:create_receiver_fetch_command).
-            with(@receiver, instance_of(Qpid::Messaging::Duration)).
-            and_return(@receive)
+          if $RUBY_VERSION == "1.8"
+            Qpid::Messaging::Synchio.should_receive(:create_receiver_fetch_command).
+              with(@receiver, instance_of(Qpid::Messaging::Duration)).
+              and_return(@receive)
+          end
         end
 
 
         it "fetches a message with the default duration" do
-          @receive.should_receive(:getSuccess).
-            and_return(true)
-          @receive.should_receive(:getMessage).
-            and_return(@message_impl)
+          if $RUBY_VERSION == "1.8"
+            @receive.should_receive(:getSuccess).
+              and_return(true)
+            @receive.should_receive(:getMessage).
+              and_return(@message_impl)
+          else
+            @receiver_impl.should_receive(:fetch).
+              with(Qpid::Messaging::Duration::FOREVER.duration_impl).
+              and_return(@message_impl)
+          end
 
           message = @receiver.fetch
 
@@ -106,10 +134,16 @@ module Qpid
         end
 
         it "fetches a message with a specified duration" do
-          @receive.should_receive(:getSuccess).
-            and_return(true)
-          @receive.should_receive(:getMessage).
-            and_return(@message_impl)
+          if $RUBY_VERSION == "1.8"
+            @receive.should_receive(:getSuccess).
+              and_return(true)
+            @receive.should_receive(:getMessage).
+              and_return(@message_impl)
+          else
+            @receiver_impl.should_receive(:fetch).
+              with(Qpid::Messaging::Duration::SECOND.duration_impl).
+              and_return(@message_impl)
+          end
 
           message = @receiver.fetch Qpid::Messaging::Duration::SECOND
 
@@ -117,8 +151,14 @@ module Qpid
         end
 
         it "raise an error when fetch receives no message" do
-          @receive.should_receive(:getSuccess).
-            and_return(false)
+          if $RUBY_VERSION == "1.8"
+            @receive.should_receive(:getSuccess).
+              and_return(false)
+          else
+            @receiver_impl.should_receive(:fetch).
+              with(Qpid::Messaging::Duration::MINUTE.duration_impl).
+              and_raise(MessagingError)
+          end
 
           expect {
             message = @receiver.fetch Qpid::Messaging::Duration::MINUTE

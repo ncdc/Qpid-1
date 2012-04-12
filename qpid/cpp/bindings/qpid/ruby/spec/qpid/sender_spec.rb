@@ -44,21 +44,37 @@ module Qpid
       describe "sends a message" do
 
         before(:each) do
-          Qpid::Messaging::Synchio.should_receive(:create_send_command).
-            with(@sender, @message).
-            and_return(@send)
+          if $RUBY_VERSION == "1.8"
+            Qpid::Messaging::Synchio.should_receive(:create_send_command).
+              with(@sender, @message).
+              and_return(@send)
+          end
         end
 
         it "successfully" do
-          @send.should_receive(:getSuccess).
-            and_return(true)
+          if $RUBY_VERSION == "1.8"
+            @send.should_receive(:getSuccess).
+              and_return(true)
+          else
+            @message.should_receive(:message_impl).
+              and_return(@message_impl)
+            @sender_impl.should_receive(:send).
+              with(@message_impl, false)
+          end
 
           @sender.send @message
         end
 
         it "with optional synch" do
-          @send.should_receive(:getSuccess).
-            and_return(true)
+          if $RUBY_VERSION == "1.8"
+            @send.should_receive(:getSuccess).
+              and_return(true)
+          else
+            @message.should_receive(:message_impl).
+              and_return(@message_impl)
+            @sender_impl.should_receive(:send).
+              with(@message_impl, true)
+          end
 
           @sender.send @message, :sync => true
         end
@@ -66,8 +82,15 @@ module Qpid
         it "with an optional block" do
           block_called = false
 
-          @send.should_receive(:getSuccess).
-            and_return(true)
+          if $RUBY_VERSION == "1.8"
+            @send.should_receive(:getSuccess).
+              and_return(true)
+          else
+            @message.should_receive(:message_impl).
+              and_return(@message_impl)
+            @sender_impl.should_receive(:send).
+              with(@message_impl, false)
+          end
 
           @sender.send @message do |message|
             message.should == @message

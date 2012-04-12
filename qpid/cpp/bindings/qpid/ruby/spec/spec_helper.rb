@@ -22,3 +22,5 @@ require 'cqpid'
 
 $QPID_TESTING_ENVIRONMENT=true
 
+$RUBY_VERSION = RbConfig::CONFIG["ruby_version"][0, 3]
+

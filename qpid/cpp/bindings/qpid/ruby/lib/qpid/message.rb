@@ -350,8 +350,10 @@ module Qpid
           # has an encoded content type
           if ["amqp/list", "amqp/map"].include? @message_impl.getContentType
             case @message_impl.getContentType
-            when "amqp/map": @content = Cqpid.decodeMap @message_impl
-            when "amqp/list": @content = Cqpid.decodeList @message_impl
+            when "amqp/map"
+              @content = Cqpid.decodeMap @message_impl
+            when "amqp/list"
+              @content = Cqpid.decodeList @message_impl
             end
           end
         end

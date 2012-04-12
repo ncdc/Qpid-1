@@ -270,11 +270,16 @@ module Qpid
       end
 
       it "can block while synchronizing with the broker" do
-        Qpid::Messaging::Synchio.should_receive(:create_sync_command).
-          with(@session).
-          and_return(@session_sync)
-        @session_sync.should_receive(:getSuccess).
-          and_return(true)
+        if $RUBY_VERSION == "1.8"
+          Qpid::Messaging::Synchio.should_receive(:create_sync_command).
+            with(@session).
+            and_return(@session_sync)
+          @session_sync.should_receive(:getSuccess).
+            and_return(true)
+        else
+          @session_impl.should_receive(:sync).
+            with(true)
+        end
 
         @session.sync :block => true
       end
@@ -310,16 +315,24 @@ module Qpid
       describe "getting the next Receiver with messages" do
 
         before(:each) do
-          Qpid::Messaging::Synchio.should_receive(:create_next_receiver_command).
-            with(@session, instance_of(Qpid::Messaging::Duration)).
-            and_return(@next_receiver)
+          if $RUBY_VERSION == "1.8"
+            Qpid::Messaging::Synchio.should_receive(:create_next_receiver_command).
+              with(@session, instance_of(Qpid::Messaging::Duration)).
+              and_return(@next_receiver)
+          end
         end
 
         it "waits forever by default" do
-          @next_receiver.should_receive(:getSuccess).
-            and_return(true)
-          @next_receiver.should_receive(:getReceiver).
-            and_return(@receiver_impl)
+          if $RUBY_VERSION == "1.8"
+            @next_receiver.should_receive(:getSuccess).
+              and_return(true)
+            @next_receiver.should_receive(:getReceiver).
+              and_return(@receiver_impl)
+          else
+            @session_impl.should_receive(:nextReceiver).
+              with(Qpid::Messaging::Duration::FOREVER.duration_impl).
+              and_return(@receiver_impl)
+          end
           @receiver_impl.should_receive(:setCapacity).with(1) if $QPID_NONBLOCK_IO
 
           receiver = @session.next_receiver
@@ -328,10 +341,16 @@ module Qpid
         end
 
         it "uses the specified time" do
-          @next_receiver.should_receive(:getSuccess).
-            and_return(true)
-          @next_receiver.should_receive(:getReceiver).
-            and_return(@receiver_impl)
+          if $RUBY_VERSION == "1.8"
+            @next_receiver.should_receive(:getSuccess).
+              and_return(true)
+            @next_receiver.should_receive(:getReceiver).
+              and_return(@receiver_impl)
+          else
+            @session_impl.should_receive(:nextReceiver).
+              with(Qpid::Messaging::Duration::SECOND.duration_impl).
+              and_return(@receiver_impl)
+          end
           @receiver_impl.should_receive(:setCapacity).with(1) if $QPID_NONBLOCK_IO
 
           receiver = @session.next_receiver Qpid::Messaging::Duration::SECOND
@@ -340,8 +359,14 @@ module Qpid
         end
 
         it "returns nil when no Receiver has messages within the timeout period" do
-          @next_receiver.should_receive(:getSuccess).
-            and_return(false)
+          if $RUBY_VERSION == "1.8"
+            @next_receiver.should_receive(:getSuccess).
+              and_return(false)
+          else
+            @session_impl.should_receive(:nextReceiver).
+              with(Qpid::Messaging::Duration::MINUTE.duration_impl).
+              and_return(nil)
+          end
 
           receiver = @session.next_receiver Qpid::Messaging::Duration::MINUTE
 
