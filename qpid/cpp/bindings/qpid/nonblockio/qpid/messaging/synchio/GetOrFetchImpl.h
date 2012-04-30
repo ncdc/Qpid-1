@@ -25,7 +25,7 @@
 #include "qpid/messaging/Duration.h"
 #include "qpid/messaging/Message.h"
 #include "qpid/messaging/Receiver.h"
-#include "qpid/messaging/synchio/BaseThreadedEventHandler.h"
+#include "qpid/messaging/synchio/SynchioCommand.h"
 
 using namespace qpid::messaging;
 
@@ -40,7 +40,7 @@ namespace qpid
     namespace synchio
     {
 
-      class GetOrFetchImpl : public BaseThreadedEventHandler
+      class GetOrFetchImpl : public SynchioCommand
       {
 
       public:
@@ -50,6 +50,7 @@ namespace qpid
         ~GetOrFetchImpl();
 
         void run();
+
         Message getMessage();
 
       private:

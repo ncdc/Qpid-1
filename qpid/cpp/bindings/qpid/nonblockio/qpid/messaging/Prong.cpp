@@ -85,7 +85,7 @@ namespace qpid
     }
 
     void Prong::updateHandles()
-    {
+    {-
       ::write(myHandle, "1", 1);
     }
 

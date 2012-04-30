@@ -33,7 +33,7 @@ namespace qpid
     {
 
       NextReceiverImpl::NextReceiverImpl(Session& session, Duration& timeout):
-        BaseThreadedEventHandler(),
+        SynchioCommand(),
         session(session),
         timeout(timeout)
       { }

@@ -48,7 +48,6 @@ namespace qpid
 
         void start();
         void stop();
-        bool isRunning();
         int  getHandle();
         bool getSuccess();
 

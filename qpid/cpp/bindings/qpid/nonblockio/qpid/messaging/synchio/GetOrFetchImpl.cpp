@@ -21,6 +21,8 @@
 
 #include "qpid/messaging/synchio/GetOrFetchImpl.h"
 
+#include <stdio.h>
+
 using namespace qpid::messaging;
 
 namespace qpid
@@ -35,7 +37,7 @@ namespace qpid
       GetOrFetchImpl::GetOrFetchImpl(GetOrFetchMode mode,
                                      Receiver& receiver,
                                      Duration& timeout):
-        BaseThreadedEventHandler(),
+        SynchioCommand(),
         mode(mode),
         receiver(receiver),
         timeout(timeout)
@@ -59,7 +61,9 @@ namespace qpid
             success = receiver.fetch(message, timeout);
           }
 
+        printf("Notifying listeners of get/fetch.\n");
         notifyListeners(success);
+        printf("Notified listeners: success=%d\n", success);
       }
 
 

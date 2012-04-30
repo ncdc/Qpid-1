@@ -40,7 +40,6 @@ namespace qpid
 
       void NextReceiver::start() { impl->start(); }
       void NextReceiver::stop() { impl->stop(); }
-      bool NextReceiver::isRunning() { return impl->isRunning(); }
       bool NextReceiver::getSuccess() { return impl->getSuccess(); }
       int NextReceiver::getHandle() { return impl->getHandle(); }
       Receiver NextReceiver::getReceiver() { return impl->getReceiver(); }

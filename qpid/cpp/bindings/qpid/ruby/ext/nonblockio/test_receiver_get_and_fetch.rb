@@ -37,9 +37,10 @@ unless SEND_ONLY
         break if finished
         message = rcv.get Qpid::Messaging::Duration::SECOND
           if message.nil?
-            puts "We got a nil message!"
+            printf "We got a nil message!\n"
             break
           else
+            printf "Received and acknowledging: #{message.content}\n"
             rcv.session.acknowledge if (received % 100).zero?
             received += 1
             # finished = true if message.content =~ /#{QUIT_KEY}/
@@ -67,6 +68,7 @@ unless RECV_ONLY
       before = Time.new
       msg = Qpid::Messaging::Message.new :content => "This is a test (##{sent}) (#{Time.new})#{iterations == MAX_ITERATIONS ? ' ' + QUIT_KEY : ''}."
 
+      printf "Sending #{msg.content}\n"
       snd.send msg
 
       after = Time.new

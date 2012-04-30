@@ -23,7 +23,7 @@
  */
 
 #include "qpid/messaging/Session.h"
-#include "qpid/messaging/synchio/BaseThreadedEventHandler.h"
+#include "qpid/messaging/synchio/SynchioCommand.h"
 
 using namespace qpid::messaging;
 
@@ -36,7 +36,7 @@ namespace qpid
     namespace synchio
     {
 
-      class AcknowledgeImpl : public BaseThreadedEventHandler
+      class AcknowledgeImpl : public SynchioCommand
       {
 
       public:

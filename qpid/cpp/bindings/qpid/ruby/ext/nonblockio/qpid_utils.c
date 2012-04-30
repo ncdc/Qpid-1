@@ -45,6 +45,8 @@ static VALUE qpid_thread_wait_method(VALUE* args)
   rb_funcall(command, rb_intern("start"), 0);
   rb_thread_wait_fd(fd);
 
+  printf("back from the wait!\n");
+
   return command;
 }
 
@@ -60,11 +62,14 @@ VALUE qpid_wait_on_command(VALUE command)
       command_args[0] = command;
       command_args[1] = rb_funcall(command, rb_intern("getHandle"), 0);
 
+      printf("The handle is %d\n", FIX2INT(command_args[1]));
+
       /* if we're in t  he main thread then we need to spawn a new thread
-       * to handle retrievin    g the message
+       * to handle retrieving the message
        */
       if (RTEST(qpid_is_main_thread()))
         {
+          printf("Creating a new Ruby thread.\n");
           VALUE receive_thread = rb_thread_create(qpid_thread_wait_method,
                                                   command_args);
 
@@ -72,10 +77,11 @@ VALUE qpid_wait_on_command(VALUE command)
         }
       else
         {
+          printf("Running in current (non-main) thread.\n");
           qpid_thread_wait_method(command_args);
         }
 
-      // stop    the handler
+      // stop the handler
       rb_funcall(command, rb_intern("stop"), 0);
     }
 

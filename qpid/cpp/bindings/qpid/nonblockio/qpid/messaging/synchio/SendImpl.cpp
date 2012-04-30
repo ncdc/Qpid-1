@@ -34,7 +34,7 @@ namespace qpid
     {
 
       SendImpl::SendImpl(Sender& sender, Message& message):
-        BaseThreadedEventHandler(),
+        SynchioCommand(),
         sender(sender),
         message(message)
       { }
@@ -49,7 +49,7 @@ namespace qpid
         sender.send(message, true);
 
         notifyListeners(true);
-      }
+       }
 
     }
 

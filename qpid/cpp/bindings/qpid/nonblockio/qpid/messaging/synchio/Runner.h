@@ -1,5 +1,5 @@
-#ifndef QPID_CLIENT_AMQP0_10_SYNCHIO_SENDIMPL_H
-#define QPID_CLIENT_AMQP0_10_SYNCHIO_SENDIMPL_H
+#ifndef QPID_MESSAGING_SYNCHIO_RUNNER_H
+#define QPID_MESSAGING_SYNCHIO_RUNNER_H
 
 /*
  *
@@ -22,9 +22,15 @@
  *
  */
 
-#include "qpid/messaging/Message.h"
-#include "qpid/messaging/Sender.h"
+#include <queue>
+
+#include "qpid/messaging/synchio/Runner.h"
 #include "qpid/messaging/synchio/SynchioCommand.h"
+#include "qpid/sys/Monitor.h"
+#include "qpid/sys/Runnable.h"
+#include "qpid/sys/Thread.h"
+
+using namespace qpid::messaging::synchio;
 
 namespace qpid
 {
@@ -35,21 +41,33 @@ namespace qpid
     namespace synchio
     {
 
-      class SendImpl : public SynchioCommand
-      {
+      class Runner : public qpid::sys::Runnable
+        {
 
-      public:
-        SendImpl(Sender& sender,
-                 Message& message);
-        virtual ~SendImpl();
+        public:
 
-        void run();
+          Runner();
+          ~Runner();
 
-      private:
-        Sender& sender;
-        Message& message;
+          void start();
+          void stop();
+          void run();
 
-      };
+          void enqueue(SynchioCommand* command);
+
+          int queueDepth() { return handlers.size(); }
+
+          static Runner* instance();
+
+        private:
+
+          std::queue<SynchioCommand*>  handlers;
+          qpid::sys::Mutex lock;
+          qpid::sys::Thread* thread;
+          bool cancelThread;
+          static Runner* _instance;
+
+        };
 
     }
 

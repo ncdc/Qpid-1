@@ -33,7 +33,7 @@ namespace qpid
 
       AcknowledgeImpl::AcknowledgeImpl(Session& session,
                                        Message* message)
-        :BaseThreadedEventHandler()
+        :SynchioCommand()
         ,session(session)
         ,message(message)
       { }

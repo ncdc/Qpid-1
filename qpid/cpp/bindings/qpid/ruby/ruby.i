@@ -26,6 +26,9 @@
 #include "qpid/messaging/synchio/Send.h"
 #include "qpid/messaging/synchio/SessionSync.h"
 
+#include "qpid/messaging/synchio/Runner.h"
+#include "qpid/messaging/synchio/SynchioCommand.h"
+
 %}
 
 %module cqpid
@@ -38,6 +41,9 @@
 %include "qpid/messaging/synchio/ReceiverGet.h"
 %include "qpid/messaging/synchio/Send.h"
 %include "qpid/messaging/synchio/SessionSync.h"
+
+%include "qpid/messaging/synchio/Runner.h"
+%include "qpid/messaging/synchio/SynchioCommand.h"
 
 /* Define the general-purpose exception handling */
 %exception {

@@ -39,6 +39,8 @@ set (qpidnonblockio_SOURCES
     qpid/messaging/synchio/ReceiverFetch.h
     qpid/messaging/synchio/ReceiverGet.cpp
     qpid/messaging/synchio/ReceiverGet.h
+    qpid/messaging/synchio/Runner.cpp
+    qpid/messaging/synchio/Runner.h
     qpid/messaging/synchio/Send.cpp
     qpid/messaging/synchio/Send.h
     qpid/messaging/synchio/SendImpl.cpp
@@ -47,6 +49,8 @@ set (qpidnonblockio_SOURCES
     qpid/messaging/synchio/SessionSync.h
     qpid/messaging/synchio/SessionSyncImpl.cpp
     qpid/messaging/synchio/SessionSyncImpl.h
+    qpid/messaging/synchio/SynchioCommand.cpp
+    qpid/messaging/synchio/SynchioCommand.h
 )
 
 add_msvc_version (qpidnonblockio library dll)

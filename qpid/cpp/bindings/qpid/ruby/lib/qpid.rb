@@ -29,7 +29,9 @@ require 'qpid/utils'
 
 begin
   require 'nonblockio'
+
   $QPID_NONBLOCK_IO=true
+  $QPID_NBIO_RUNNER=Cqpid::Runner.instance()
 rescue Exception => error
   $QPID_NONBLOCK_IO=false
 end

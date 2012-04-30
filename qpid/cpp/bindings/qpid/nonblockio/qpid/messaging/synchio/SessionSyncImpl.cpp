@@ -31,7 +31,7 @@ namespace qpid
     {
 
       SessionSyncImpl::SessionSyncImpl(Session& session):
-        BaseThreadedEventHandler(),
+        SynchioCommand(),
         session(session)
       { }
       SessionSyncImpl::~SessionSyncImpl()
