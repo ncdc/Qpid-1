@@ -1186,6 +1186,7 @@ set (qmf_SOURCES
 set (qmf_HEADERS
   ../include/qpid/agent/ManagementAgent.h
   ../include/qpid/agent/QmfAgentImportExport.h
+  ../include/qmf/BrokerImportExport.h
     )
 
 add_msvc_version (qmf library dll)
