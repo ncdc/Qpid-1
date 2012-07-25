@@ -39,7 +39,7 @@ EXTRA_DIST += perl/perl.i perl/CMakeLists.txt
 BUILT_SOURCES = perl/cqpid_perl.cpp
 SWIG_FLAGS = -w362,401
 
-perl/cqpid_perl.cpp: $(srcdir)/perl/perl.i $(srcdir)/qpid.i $(srcdir)/../swig_perl_typemaps.i
+perl/cqpid_perl.cpp: $(srcdir)/perl/perl.i
 	$(SWIG) -perl -c++ $(SWIG_FLAGS) $(INCLUDES) $(QPID_CXXFLAGS) -I/usr/include -o perl/cqpid_perl.cpp $(srcdir)/perl/perl.i
 
 perl/Makefile: perl/cqpid_perl.cpp

@@ -19,7 +19,7 @@
 
 %module cqpid
 %include "std_string.i"
-%include "../../swig_ruby_typemaps.i"
+%include "swig_ruby_typemaps.i"
 
 /* Define the general-purpose exception handling */
 %exception {
@@ -32,5 +32,5 @@
     }
 }
 
-%include "../qpid.i"
+%include "qpid.i"
 
