@@ -61,6 +61,13 @@ set (QPIDD_CONF_FILE ${QPID_INSTALL_CONFDIR}/qpidd.conf CACHE STRING
 
 install(FILES  LICENSE NOTICE  DESTINATION ${CMAKE_INSTALL_PREFIX})
 install(FILES  xml/cluster.xml DESTINATION ${QPID_INSTALL_DATADIR})
+install(FILES  include/qpid.i
+               include/qmfengine.i
+               include/qmf2.i
+               include/swig_perl_typemaps.i
+               include/swig_python_typemaps.i
+               include/swig_ruby_typemaps.i
+        DESTINATION ${QPID_INSTALL_INCLUDEDIR})
 
 if (WIN32)
    set (CMAKE_DEBUG_POSTFIX "d")
