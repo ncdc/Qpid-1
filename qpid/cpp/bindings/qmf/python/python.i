@@ -139,5 +139,5 @@
 
 
 
-%include "../qmfengine.i"
+%include "qmfengine.i"
 
