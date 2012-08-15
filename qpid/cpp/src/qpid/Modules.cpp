@@ -73,7 +73,7 @@ void tryShlib(const char* libname_, bool noThrow) {
 
 void loadModuleDir (std::string dirname, bool isDefault)
 {
-    fs::path dirPath (dirname, fs::native);
+    fs::path dirPath (dirname);
 
     if (!fs::exists (dirPath))
     {
@@ -89,8 +89,8 @@ void loadModuleDir (std::string dirname, bool isDefault)
     fs::directory_iterator endItr;
     for (fs::directory_iterator itr (dirPath); itr != endItr; ++itr)
     {
-        if (!fs::is_directory(*itr) && isShlibName(itr->string()))
-            tryShlib (itr->string().data(), true);
+      if (!fs::is_directory(*itr) && isShlibName(itr->path().native()))
+        tryShlib (itr->path().native().data(), true);
     }
 }
 

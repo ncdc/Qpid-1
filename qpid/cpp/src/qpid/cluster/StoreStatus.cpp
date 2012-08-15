@@ -77,7 +77,7 @@ void StoreStatus::load() {
         throw Exception(QPID_MSG("No data-dir: When a store is loaded together with clustering, --data-dir must be specified."));
     }
     try {
-        fs::path dir = fs::path(dataDir, fs::native)/SUBDIR;
+        fs::path dir = fs::path(dataDir)/SUBDIR;
         create_directory(dir);
         fs::path file = dir/STORE_STATUS;
         if (fs::exists(file)) {
@@ -106,7 +106,7 @@ void StoreStatus::save() {
     try {
         ostringstream os;
         os << clusterId << endl << shutdownId << endl;
-        fs::path file = fs::path(dataDir, fs::native)/SUBDIR/STORE_STATUS;
+        fs::path file = fs::path(dataDir)/SUBDIR/STORE_STATUS;
         writeFile(file, os.str());
     }
     catch (const std::exception& e) {

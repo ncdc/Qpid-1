@@ -137,7 +137,7 @@ qpidtest_SCRIPTS =
 tmoduleexecdir = $(libdir)/qpid/tests
 tmoduleexec_LTLIBRARIES=
 
-AM_CXXFLAGS += -DBOOST_FILESYSTEM_VERSION=2
+AM_CXXFLAGS += -DBOOST_FILESYSTEM_VERSION=3
 
 ## Automake macros to build libraries and executables.
 qpidd_CXXFLAGS = $(AM_CXXFLAGS) -DQPIDD_MODULE_DIR=\"$(dmoduleexecdir)\" -DQPIDD_CONF_FILE=\"$(sysconfdir)/qpidd.conf\" -DQPIDC_CONF_FILE=\"$(confdir)/qpidc.conf\"
