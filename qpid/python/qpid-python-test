@@ -42,7 +42,7 @@ parser = optparse.OptionParser(usage="usage: %prog [options] PATTERN ...",
                                description="Run tests matching the specified PATTERNs.")
 parser.add_option("-l", "--list", action="store_true", default=False,
                   help="list tests instead of executing them")
-parser.add_option("-b", "--broker", default="localhost",
+parser.add_option("-b", "--broker", default="localhost:5672",
                   help="run tests against BROKER (default %default)")
 parser.add_option("-f", "--log-file", metavar="FILE", help="log output to FILE")
 parser.add_option("-v", "--log-level", metavar="LEVEL", default="WARN",
