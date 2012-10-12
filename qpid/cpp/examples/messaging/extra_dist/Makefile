@@ -18,7 +18,7 @@
 #
 CXX=g++
 CXXFLAGS=-g -O2
-LDFLAGS=-lqpidmessaging
+LDFLAGS=-lqpidmessaging -lqpidtypes -lstdc++
 
 all: drain spout client server map_sender map_receiver hello_world
 
