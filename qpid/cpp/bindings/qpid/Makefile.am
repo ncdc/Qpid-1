@@ -77,4 +77,8 @@ CLEANFILES = perl/cqpid_perl.cpp perl/Makefile.old perl/cqpid_perl.pm
 
 endif
 
+if HAVE_PHP_DEVEL
+SUBDIRS += php
+endif
+
 endif

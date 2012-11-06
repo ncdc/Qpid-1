@@ -17,12 +17,14 @@
 # under the License.
 #
 
+SET(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/CMakeModules)
 
 include(FindSWIG)
 include(UseSWIG)
 include(FindRuby)
 include(FindPythonLibs)
 include(FindPerlLibs)
+include(FindPHPDev)
 
 set (SWIG_MINIMUM_VERSION "1.3.32")
 
@@ -65,4 +67,9 @@ if (SWIG_FOUND)
 
         add_subdirectory(qpid/perl)
     endif (PERLLIBS_FOUND)
+
+    if (PHPDEV_FOUND)
+        add_subdirectory(qpid/php)
+        add_subdirectory(qmf2/php)
+    endif (PHPDEV_FOUND)
 endif (SWIG_FOUND)
