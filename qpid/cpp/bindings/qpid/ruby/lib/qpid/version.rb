@@ -22,8 +22,8 @@ module Qpid
   module Version
 
     NUMBERS = [MAJOR = 0,
-               MINOR = 17,
-               BUILD = 0]
+               MINOR = 18,
+               BUILD = 2]
   end
 
   VERSION = Version::NUMBERS.join('.')
