@@ -23,7 +23,7 @@ module Qpid #:nodoc:
 
     NUMBERS = [MAJOR = 0,
                MINOR = 18,
-               BUILD = 2]
+               BUILD = 3]
   end
 
   VERSION = Version::NUMBERS.join('.')
