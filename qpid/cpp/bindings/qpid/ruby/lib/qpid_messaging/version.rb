@@ -22,7 +22,7 @@ module Qpid #:nodoc:
   module Version
 
     NUMBERS = [MAJOR = 0,
-               MINOR = 17,
+               MINOR = 20,
                BUILD = 0]
   end
 
