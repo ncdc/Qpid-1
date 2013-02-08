@@ -15,7 +15,8 @@ Gem::Specification.new do |s|
   s.summary     = "Qpid is an enterprise messaging framework."
   s.description = s.summary
 
-  s.extensions   = "ext/cqpid/extconf.rb"
+  s.extensions   = ["ext/cqpid/extconf.rb",
+                    "ext/qpid_session_dispatcher/extconf.rb"]
   s.files        = Dir["LICENSE",
                    "ChangeLog",
                    "README.rdoc",

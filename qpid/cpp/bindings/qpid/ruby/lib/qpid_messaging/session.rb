@@ -31,6 +31,11 @@ module Qpid
       def initialize(connection, session) # :nodoc:
         @connection   = connection
         @session_impl = session
+        @dispatcher = Qpid::Messaging::SessionDispatcher.new(self)
+        # launch the dispatcher
+        Thread.new do
+          @dispatcher.start
+        end
       end
 
       def session_impl # :nodoc:
@@ -40,6 +45,12 @@ module Qpid
       # Returns the Connection associated with this session.
       def connection
         @connection
+      end
+
+      def incoming(receiver)
+        printf "Receiving message from #{receiver}: #{Time.now}\n"
+        msg = receiver.get Qpid::Messaging::Duration::IMMEDIATE
+        printf "We received; #{msg.content}\n"
       end
 
       # Creates a new endpoint for sending messages.
