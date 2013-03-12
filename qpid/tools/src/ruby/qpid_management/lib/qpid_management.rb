@@ -35,3 +35,48 @@ require 'qpid_management/queue'
 require 'qpid_management/session'
 require 'qpid_management/subscription'
 
+module Qpid
+  # The Qpid Management framework is a management framework for Qpid brokers
+  # that uses QMF2.
+  #
+  # ==== Example Usage
+  #
+  # Here is a simple example. It TODO.
+  #
+  #   require 'rubygems'
+  #   require 'qpid_messaging'
+  #   require 'qpid_management'
+  #
+  #   # create a connection and open it
+  #   conn = Qpid::Messaging::Connection.new(:url => "broker.myqpiddomain.com")
+  #   conn.open()
+  #
+  #   # create a broker agent
+  #   agent = Qpid::Management::BrokerAgent.new(conn)
+  #
+  #   # get a reference to the broker
+  #   broker = agent.broker
+  #
+  #   # print out all exchange names
+  #   puts broker.exchanges.map(&:name)
+  #
+  #   # print out info about a single exchange
+  #   amq_direct = broker.exchange('amq.direct')
+  #   puts amq_direct
+  #   puts amq_direct.msgDrops
+  #
+  #   # create an exchange
+  #   broker.add_exchange('topic', 'myexchange')
+  #
+  #   # print out all queue names
+  #   puts broker.queues.map(&:name)
+  #
+  #   # create a queue
+  #   broker.add_queue('myqueue')
+  #
+  #   # print out info about a single queue
+  #   myqueue = broker.queue('myqueue')
+  #   puts myqueue.msgDepth
+  module Management
+  end
+end

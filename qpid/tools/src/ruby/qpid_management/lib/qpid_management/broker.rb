@@ -73,7 +73,7 @@ module Qpid
       end
 
       # Queries the broker for a single Connection QMF object.
-      # @param [String] object id of the connection, e.g. "[::1]:5672-[::1]:41066". Note, this is the short form of the object id; "org.apache.qpid.broker:connection:" is prepended to this parameter.
+      # @param [String] oid object id of the connection, e.g. "[::1]:5672-[::1]:41066". Note, this is the short form of the object id; "org.apache.qpid.broker:connection:" is prepended to this parameter.
       # @return [Connection] the Connection QMF object
       def connection(oid)
         @agent.find_by_object_id(Connection, "org.apache.qpid.broker:connection:#{oid}")
@@ -86,7 +86,7 @@ module Qpid
       end
 
       # Queries the broker for a single Session QMF object.
-      # @param [String] object id of the session, e.g. "d1155105-b2c6-4b9e-8f1b-08fba0f05bf2". Note, this is the short form of the object id; "org.apache.qpid.broker:session:" is prepended to this parameter.
+      # @param [String] oid object id of the session, e.g. "d1155105-b2c6-4b9e-8f1b-08fba0f05bf2". Note, this is the short form of the object id; "org.apache.qpid.broker:session:" is prepended to this parameter.
       # @return [Session] the Session QMF object
       def session(oid)
         @agent.find_by_object_id(Session, "org.apache.qpid.broker:session:#{oid}")
@@ -99,7 +99,7 @@ module Qpid
       end
 
       # Queries the broker for a single Subscription QMF object.
-      # @param [String] object id of the subscription, e.g. "org.apache.qpid.broker:session:d1155105-b2c6-4b9e-8f1b-08fba0f05bf2,org.apache.qpid.broker:queue:amq.direct_1b5550ea-3fcd-41a5-b89a-de58edf840a5,amq.direct". Note, this is the short form of the object id; "org.apache.qpid.broker:subscription:" is prepended to this parameter.
+      # @param [String] oid object id of the subscription, e.g. "org.apache.qpid.broker:session:d1155105-b2c6-4b9e-8f1b-08fba0f05bf2,org.apache.qpid.broker:queue:amq.direct_1b5550ea-3fcd-41a5-b89a-de58edf840a5,amq.direct". Note, this is the short form of the object id; "org.apache.qpid.broker:subscription:" is prepended to this parameter.
       # @return [Subscription] the Subscription QMF object
       def subscription(oid)
         @agent.find_by_object_id(Subscription, "org.apache.qpid.broker:subscription:#{oid}")
@@ -112,7 +112,7 @@ module Qpid
       end
 
       # Queries the broker for a single Exchange QMF object.
-      # @param [String] object id of the exchange, e.g. "amq.direct". Note, this is the short form of the object id; "org.apache.qpid.broker:exchange:" is prepended to this parameter.
+      # @param [String] name object id of the exchange, e.g. "amq.direct". Note, this is the short form of the object id; "org.apache.qpid.broker:exchange:" is prepended to this parameter.
       # @return [Exchange] the Exchange QMF object
       def exchange(name)
         @agent.find_by_object_id(Exchange, "org.apache.qpid.broker:exchange:#{name}")
@@ -125,7 +125,7 @@ module Qpid
       end
 
       # Queries the broker for a single Queue QMF object.
-      # @param [String] object id of the queue, e.g. "myqueue". Note, this is the short form of the object id; "org.apache.qpid.broker:queue:" is prepended to this parameter.
+      # @param [String] name object id of the queue, e.g. "myqueue". Note, this is the short form of the object id; "org.apache.qpid.broker:queue:" is prepended to this parameter.
       # @return [Queue] the Queue QMF object
       def queue(name)
         @agent.find_by_object_id(Queue, "org.apache.qpid.broker:queue:#{name}")
@@ -138,7 +138,7 @@ module Qpid
       end
 
       # Queries the broker for a single Binding QMF object.
-      # @param [String] object id of the binding, e.g. "org.apache.qpid.broker:exchange:amq.topic,org.apache.qpid.broker:queue:myqueue,foo.#.bar". Note, this is the short form of the object id; "org.apache.qpid.broker:binding:" is prepended to this parameter.
+      # @param [String] name object id of the binding, e.g. "org.apache.qpid.broker:exchange:amq.topic,org.apache.qpid.broker:queue:myqueue,foo.#.bar". Note, this is the short form of the object id; "org.apache.qpid.broker:binding:" is prepended to this parameter.
       # @return [Binding] the Binding QMF object
       def binding(name)
         @agent.find_by_object_id(Binding, "org.apache.qpid.broker:binding:#{name}")
@@ -151,7 +151,7 @@ module Qpid
       end
 
       # Queries the broker for a single Link QMF object.
-      # @param [String] object id of the link, e.g. "qpid.tcp:10.0.0.1:8888". Note, this is the short form of the object id; "org.apache.qpid.broker:link:" is prepended to this parameter.
+      # @param [String] name object id of the link, e.g. "qpid.tcp:10.0.0.1:8888". Note, this is the short form of the object id; "org.apache.qpid.broker:link:" is prepended to this parameter.
       # @return [Link] the Link QMF object
       def link(name)
         @agent.find_by_object_id(Link, "org.apache.qpid.broker:link:#{name}")
@@ -164,7 +164,7 @@ module Qpid
       end
 
       # Queries the broker for a single Bridge QMF object.
-      # @param [String] object id of the bridge, e.g. "org.apache.qpid.broker:link:qpid.tcp:10.0.0.1:8888,qpid.tcp:10.0.0.1:8888!bridgeq!amq.topic!". Note, this is the short form of the object id; "org.apache.qpid.broker:bridge:" is prepended to this parameter.
+      # @param [String] name object id of the bridge, e.g. "org.apache.qpid.broker:link:qpid.tcp:10.0.0.1:8888,qpid.tcp:10.0.0.1:8888!bridgeq!amq.topic!". Note, this is the short form of the object id; "org.apache.qpid.broker:bridge:" is prepended to this parameter.
       # @return [Bridge] the Bridge QMF object
       def bridge(name)
         @agent.find_by_object_id(Bridge, "org.apache.qpid.broker:bridge:#{name}")
