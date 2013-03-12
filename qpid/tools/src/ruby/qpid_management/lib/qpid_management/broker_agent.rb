@@ -22,7 +22,7 @@ require 'securerandom'
 
 module Qpid
   module Management
-    # This is the primary class that interacts with a qpid messaging broker for
+    # This is the primary class that interacts with a Qpid messaging broker for
     # querying information from the broker and for configuring it.
     class BrokerAgent
       # Creates a new BrokerAgent instance. A new Qpid::Messaging::Session,
@@ -119,8 +119,12 @@ module Qpid
       end
 
       def find_all_by_class(clazz)
-        query = {'_what' => 'OBJECT',
-                 '_schema_id' => {'_class_name' => BrokerObject.qmf_class(clazz)}}
+        query = {
+          '_what' => 'OBJECT',
+          '_schema_id' => {
+            '_class_name' => BrokerObject.qmf_class(clazz)
+          }
+        }
 
         items = send_query(query)
 
@@ -138,8 +142,13 @@ module Qpid
       end
 
       def find_by_object_id(clazz, oid)
-        query = {'_what' => 'OBJECT',
-                 '_object_id' => {'_object_name' => oid}}
+        query = {
+          '_what' => 'OBJECT',
+          '_object_id' => {
+            '_object_name' => oid
+          }
+        }
+
         results = send_query(query)
 
         return clazz.new(self, results[0]) if results.count == 1 and not results[0].nil?
