@@ -20,6 +20,18 @@
 # for simplistic UUID - may want to consider something better in the future
 require 'securerandom'
 
+# Ruby 1.8 doesn't include SecureRandom#uuid, so let's add it if it's missing
+unless SecureRandom.respond_to? :uuid
+  module SecureRandom
+    def self.uuid
+      ary = self.random_bytes(16).unpack("NnnnnN")
+      ary[2] = (ary[2] & 0x0fff) | 0x4000
+      ary[3] = (ary[3] & 0x3fff) | 0x8000
+      "%08x-%04x-%04x-%04x-%04x%08x" % ary
+    end
+  end
+end
+
 module Qpid
   module Management
     # This is the primary class that interacts with a Qpid messaging broker for
