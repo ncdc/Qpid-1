@@ -31,22 +31,63 @@ describe Qpid::Management::Broker do
   after(:each) do
     @agent.close()
     @connection.close()
-    `qpidd -q --port #{@broker_port}`
+    `qpidd --quit --port #{@broker_port}`
   end
 
-  describe '#connections' do
-    let(:connections) { @broker.connections }
+  def setup_queue_route
+    @other_port = `qpidd --no-data-dir --auth=no --no-module-dir --daemon --port 0`.chop
+    @broker.add_link('link1', 'localhost', @other_port)
+    @broker.add_queue('queue')
+    @broker.add_queue_route('qr1',
+                            'link1',
+                            'queue',
+                            'amq.direct',
+                            2)
+  end
 
-    it 'returns at least 1 connection' do
-      connections.count.should be > 0
+  %w(connection session subscription exchange queue binding link bridge).each do |type|
+    describe "##{type}s" do
+      before(:each) do
+        setup_queue_route if %w(link bridge).include?(type)
+      end
+
+      after(:each) do
+        if %w(link bridge).include?(type)
+          `qpidd --quit --port #{@other_port}`
+        end
+      end
+
+      let(:collection) { @broker.send("#{type}s") }
+
+      it "returns at least 1 #{type}" do
+        if type == 'subscription'
+          session = @connection.create_session
+          receiver = session.create_receiver("amq.direct/temp")
+        end
+        collection.count.should be > 0
+      end
     end
-  end
 
-  describe '#connection' do
-    let(:conn) { @broker.connections[0] }
+    describe "##{type}" do
+      before(:each) do
+        setup_queue_route if %w(link bridge).include?(type)
+      end
 
-    it 'returns a connection by oid' do
-      @broker.connection(conn.short_id).id.should == conn.id
+      after(:each) do
+        if %w(link bridge).include?(type)
+          `qpidd --quit --port #{@other_port}`
+        end
+      end
+
+      let(:object) { @broker.send("#{type}s")[0] }
+
+      it "returns a #{type} by oid" do
+        if type == 'subscription'
+          session = @connection.create_session
+          receiver = session.create_receiver("amq.direct/temp")
+        end
+        @broker.send(type, object.short_id).id.should == object.id
+      end
     end
   end
 

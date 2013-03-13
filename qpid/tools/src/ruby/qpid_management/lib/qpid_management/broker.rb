@@ -66,121 +66,51 @@ module Qpid
     # - version
     # - workerThreads
     class Broker < BrokerObject
-      # Queries the broker for all the Connection QMF objects.
-      # @return [Array<Connection>] an Array of Connection QMF objects
-      def connections()
-        @agent.find_all_by_class(Connection)
+      # Adds methods for the specified collections to be able to access all instances
+      # of a given collection, as well as a single instance by oid.
+      #
+      # == Example
+      # <tt>has_many :queues</tt> which will add:
+      # * <tt>#queues</tt> to retrieve all queues
+      # * <tt>#queue(oid)</tt> to retrieve a queue by oid (note, this is the short form of the object id, e.g. "myqueue" for a queue instead of "org.apache.qpid.broker:queue:myqueue"
+      #
+      # @param collections one or more symbols for the collections of objects a broker manages
+      def self.has_many(*collections)
+        [*collections].each do |collection|
+          singular_form = collection.to_s[0..-2]
+          capitalized_type = singular_form.gsub(/^\w/) { $&.upcase }
+
+          define_method(collection) do
+            @agent.find_all_by_class(Qpid::Management::const_get(capitalized_type))
+          end
+
+          define_method(singular_form) do |oid|
+            @agent.find_by_object_id(Qpid::Management::const_get(capitalized_type), "org.apache.qpid.broker:#{singular_form}:#{oid}")
+          end
+        end
       end
 
-      # Queries the broker for a single Connection QMF object.
-      # @param [String] oid object id of the connection, e.g. "[::1]:5672-[::1]:41066". Note, this is the short form of the object id; "org.apache.qpid.broker:connection:" is prepended to this parameter.
-      # @return [Connection] the Connection QMF object
-      def connection(oid)
-        @agent.find_by_object_id(Connection, "org.apache.qpid.broker:connection:#{oid}")
+      # Adds method for the specified types to be able to access the singular
+      # instance of a given type.
+      #
+      # == Example
+      # <tt>has_one :acl</tt> which will add:
+      # * <tt>#acl</tt> to retrieve the Acl data for the Broker
+      #
+      # @param types one or more symbols for the singular objects a broker manages
+      def self.has_one(*types)
+        [*types].each do |type|
+          capitalized_type = type.to_s.gsub(/^\w/) { $&.upcase }
+
+          define_method("#{type}") do
+            @agent.find_first_by_class(Qpid::Management::const_get(capitalized_type))
+          end
+        end
       end
 
-      # Queries the broker for all the Session QMF objects.
-      # @return [Array<Session>] an Array of Session QMF objects
-      def sessions
-        @agent.find_all_by_class(Session)
-      end
+      has_many :connections, :sessions, :subscriptions, :exchanges, :queues, :bindings, :links, :bridges
+      has_one :acl, :memory
 
-      # Queries the broker for a single Session QMF object.
-      # @param [String] oid object id of the session, e.g. "d1155105-b2c6-4b9e-8f1b-08fba0f05bf2". Note, this is the short form of the object id; "org.apache.qpid.broker:session:" is prepended to this parameter.
-      # @return [Session] the Session QMF object
-      def session(oid)
-        @agent.find_by_object_id(Session, "org.apache.qpid.broker:session:#{oid}")
-      end
-
-      # Queries the broker for all the Subscription QMF objects.
-      # @return [Array<Subscription>] an Array of Subscription QMF objects
-      def subscriptions
-        @agent.find_all_by_class(Subscription)
-      end
-
-      # Queries the broker for a single Subscription QMF object.
-      # @param [String] oid object id of the subscription, e.g. "org.apache.qpid.broker:session:d1155105-b2c6-4b9e-8f1b-08fba0f05bf2,org.apache.qpid.broker:queue:amq.direct_1b5550ea-3fcd-41a5-b89a-de58edf840a5,amq.direct". Note, this is the short form of the object id; "org.apache.qpid.broker:subscription:" is prepended to this parameter.
-      # @return [Subscription] the Subscription QMF object
-      def subscription(oid)
-        @agent.find_by_object_id(Subscription, "org.apache.qpid.broker:subscription:#{oid}")
-      end
-
-      # Queries the broker for all the Exchange QMF objects.
-      # @return [Array<Exchange>] an Array of Exchange QMF objects
-      def exchanges
-        @agent.find_all_by_class(Exchange)
-      end
-
-      # Queries the broker for a single Exchange QMF object.
-      # @param [String] name object id of the exchange, e.g. "amq.direct". Note, this is the short form of the object id; "org.apache.qpid.broker:exchange:" is prepended to this parameter.
-      # @return [Exchange] the Exchange QMF object
-      def exchange(name)
-        @agent.find_by_object_id(Exchange, "org.apache.qpid.broker:exchange:#{name}")
-      end
-
-      # Queries the broker for all the Queue QMF objects.
-      # @return [Array<Queue>] an Array of Queue QMF objects
-      def queues
-        @agent.find_all_by_class(Queue)
-      end
-
-      # Queries the broker for a single Queue QMF object.
-      # @param [String] name object id of the queue, e.g. "myqueue". Note, this is the short form of the object id; "org.apache.qpid.broker:queue:" is prepended to this parameter.
-      # @return [Queue] the Queue QMF object
-      def queue(name)
-        @agent.find_by_object_id(Queue, "org.apache.qpid.broker:queue:#{name}")
-      end
-
-      # Queries the broker for all the Binding QMF objects.
-      # @return [Array<Binding>] an Array of Binding QMF objects
-      def bindings
-        @agent.find_all_by_class(Binding)
-      end
-
-      # Queries the broker for a single Binding QMF object.
-      # @param [String] name object id of the binding, e.g. "org.apache.qpid.broker:exchange:amq.topic,org.apache.qpid.broker:queue:myqueue,foo.#.bar". Note, this is the short form of the object id; "org.apache.qpid.broker:binding:" is prepended to this parameter.
-      # @return [Binding] the Binding QMF object
-      def binding(name)
-        @agent.find_by_object_id(Binding, "org.apache.qpid.broker:binding:#{name}")
-      end
-
-      # Queries the broker for all the Link QMF objects.
-      # @return [Array<Link>] an Array of Link QMF objects
-      def links
-        @agent.find_all_by_class(Link)
-      end
-
-      # Queries the broker for a single Link QMF object.
-      # @param [String] name object id of the link, e.g. "qpid.tcp:10.0.0.1:8888". Note, this is the short form of the object id; "org.apache.qpid.broker:link:" is prepended to this parameter.
-      # @return [Link] the Link QMF object
-      def link(name)
-        @agent.find_by_object_id(Link, "org.apache.qpid.broker:link:#{name}")
-      end
-
-      # Queries the broker for all the Bridge QMF objects.
-      # @return [Array<Bridge>] an Array of Bridge QMF objects
-      def bridges
-        @agent.find_all_by_class(Bridge)
-      end
-
-      # Queries the broker for a single Bridge QMF object.
-      # @param [String] name object id of the bridge, e.g. "org.apache.qpid.broker:link:qpid.tcp:10.0.0.1:8888,qpid.tcp:10.0.0.1:8888!bridgeq!amq.topic!". Note, this is the short form of the object id; "org.apache.qpid.broker:bridge:" is prepended to this parameter.
-      # @return [Bridge] the Bridge QMF object
-      def bridge(name)
-        @agent.find_by_object_id(Bridge, "org.apache.qpid.broker:bridge:#{name}")
-      end
-
-      # Queries the broker for the ACL QMF object.
-      # @return [Acl] the ACL QMF object
-      def acl
-        @agent.find_first_by_class(Acl)
-      end
-
-      # Queries the broker for the Memory QMF object.
-      # @return [Memory] the Memory QMF object
-      def memory
-        @agent.find_first_by_class(Memory)
-      end
       # Adds an exchange to the broker
       # @param [String] type exchange type (fanout, direct, topic, headers, xml)
       # @param [String] name exchange name
@@ -278,6 +208,7 @@ module Qpid
       end
 
     private
+
 
       def create_broker_object(type, name, options)
         invoke_method('create', {'type' => type,
