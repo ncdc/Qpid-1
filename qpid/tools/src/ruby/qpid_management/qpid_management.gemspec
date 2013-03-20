@@ -25,15 +25,12 @@ Gem::Specification.new do |s|
   s.version     = "1.0"
   s.authors     = ["Apache Qpid Project"]
   s.email       = ["dev@qpid.apache.org"]
-  s.homepage    = ""
+  s.homepage    = "http://qpid.apache.org"
   s.summary     = %q{Qpid management library}
   s.description = %q{Qpid management library}
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
   s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   s.require_paths = ["lib"]
-
-  # specify any dependencies here; for example:
-  #s.add_development_dependency "rspec"
   s.add_runtime_dependency 'qpid_messaging'
 end
