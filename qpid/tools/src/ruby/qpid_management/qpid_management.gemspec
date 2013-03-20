@@ -19,11 +19,10 @@
 
 # -*- encoding: utf-8 -*-
 $:.push File.expand_path("../lib", __FILE__)
-require "qpid_management/version"
 
 Gem::Specification.new do |s|
   s.name        = "qpid_management"
-  s.version     = Qpid::Management::VERSION
+  s.version     = "1.0"
   s.authors     = ["Apache Qpid Project"]
   s.email       = ["dev@qpid.apache.org"]
   s.homepage    = ""

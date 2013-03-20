@@ -17,7 +17,6 @@
 # under the License.
 #
 
-require "qpid_management/version"
 require 'qpid_management/broker_agent'
 require 'qpid_management/broker_object'
 require 'qpid_management/acl'
