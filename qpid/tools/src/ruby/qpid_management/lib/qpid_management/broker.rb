@@ -186,18 +186,69 @@ module Qpid
 
       # Adds a queue route
       # @param [String] name the name of the bridge to create
-      # @param [String] link the name of the link to use
-      # @param [String] queue the name of the source queue from which messages are pulled
-      # @param [String] exchange the name of the destination exchange to which messages are sent
-      # @param [Fixnum] sync the number of messages to send before issuing an explicit session sync
-      def add_queue_route(name, link, queue, exchange, sync)
+      # @param [Hash] options options for the queue route
+      # @option options [String] :link the name of the link to use (required)
+      # @option options [String] :queue the name of the source queue from which messages are pulled (required)
+      # @option options [String] :exchange the name of the destination exchange to which messages are sent (required)
+      # @option options [Fixnum] :sync the number of messages to send before issuing an explicit session sync (required)
+      def add_queue_route(name, options={})
+        validate_options(options, [:link, :queue, :exchange, :sync])
+
         properties = {
-          'link' => link,
-          'src' => queue,
-          'dest' => exchange,
+          'link' => options[:link],
+          'src' => options[:queue],
+          'dest' => options[:exchange],
           'srcIsQueue' => true,
-          'sync' => sync
+          'sync' => options[:sync]
         }
+
+        create_broker_object('bridge', name, properties)
+      end
+
+      # Adds an exchange route
+      # @param [String] name the name of the bridge to create
+      # @param [Hash] options options for the exchange route
+      # @option options [String] :link the name of the link to use (required)
+      # @option options [String] :exchange the name of the exchange to use (required)
+      # @option options [String] :key routing key to federate (required)
+      # @option options [Fixnum] :sync the number of messages to send before issuing an explicit session sync (required)
+      # @option options [String] :bridge_queue name of the queue to use as a bridge queue (optional)
+      def add_exchange_route(name, options={})
+        validate_options(options, [:link, :exchange, :key, :sync])
+
+        properties = {
+          'link' => options[:link],
+          'src' => options[:exchange],
+          'dest' => options[:exchange],
+          'key' => options[:key],
+          'sync' => options[:sync]
+        }
+
+        properties['queue'] = options[:bridge_queue] if options.has_key?(:bridge_queue)
+
+        create_broker_object('bridge', name, properties)
+      end
+
+      # Adds a dynamic route
+      # @param [String] name the name of the bridge to create
+      # @param [Hash] options options for the dynamic route
+      # @option options [String] :link the name of the link to use (required)
+      # @option options [String] :exchange the name of the exchange to use (required)
+      # @option options [Fixnum] :sync the number of messages to send before issuing an explicit session sync (required)
+      # @option options [String] :bridge_queue name of the queue to use as a bridge queue (optional)
+      def add_dynamic_route(name, options={})
+        validate_options(options, [:link, :exchange, :sync])
+
+        properties = {
+          'link' => options[:link],
+          'src' => options[:exchange],
+          'dest' => options[:exchange],
+          'dynamic' => true,
+          'sync' => options[:sync]
+        }
+
+        properties['queue'] = options[:bridge_queue] if options.has_key?(:bridge_queue)
+
         create_broker_object('bridge', name, properties)
       end
 
@@ -209,13 +260,19 @@ module Qpid
 
     private
 
-
       def create_broker_object(type, name, options)
         invoke_method('create', {'type' => type,
                                  'name' => name,
                                  'properties' => options,
                                  'strict' => true})
       end
+
+      def validate_options(options, required)
+        required.each do |req|
+          raise "Option :#{req.to_s} is required" unless options.has_key?(req)
+        end
+      end
+
     end
   end
 end

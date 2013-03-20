@@ -39,10 +39,10 @@ describe Qpid::Management::Broker do
     @broker.add_link('link1', 'localhost', @other_port)
     @broker.add_queue('queue')
     @broker.add_queue_route('qr1',
-                            'link1',
-                            'queue',
-                            'amq.direct',
-                            2)
+                            link: 'link1',
+                            queue: 'queue',
+                            exchange: 'amq.direct',
+                            sync: 2)
   end
 
   %w(connection session subscription exchange queue binding link bridge).each do |type|
@@ -235,36 +235,139 @@ describe Qpid::Management::Broker do
   end
 
   describe "#add_queue_route" do
-    before(:each) do
-      @other_port = `/usr/sbin/qpidd --no-data-dir --auth=no --no-module-dir --daemon --port 0`.chop
-      @broker.add_link('link1', 'localhost', @other_port)
-      @broker.add_queue('queue')
-      @broker.add_queue_route('qr1',
-                              'link1',
-                              'queue',
-                              'amq.direct',
-                              2)
+    context "with missing options" do
+      [:link, :queue, :exchange, :sync].each do |opt|
+        opts = {link: 'l', queue: 'q', exchange: 'e', sync:2}
+        opts.delete(opt)
+        it "raises an error when :#{opt} is missing" do
+          expect { @broker.add_queue_route('name', opts) }.to raise_error(/Option :#{opt} is required/)
+        end
+      end
     end
 
-    after(:each) do
-      `/usr/sbin/qpidd -q --port #{@other_port}`
+    context "with all required options" do
+      before(:each) do
+        @other_port = `/usr/sbin/qpidd --no-data-dir --auth=no --no-module-dir --daemon --port 0`.chop
+        @broker.add_link('link1', 'localhost', @other_port)
+        @broker.add_queue('queue')
+        @broker.add_queue_route('qr1',
+                                link: 'link1',
+                                queue: 'queue',
+                                exchange: 'amq.direct',
+                                sync: 2)
+      end
+
+      after(:each) do
+        `/usr/sbin/qpidd -q --port #{@other_port}`
+      end
+
+      it "adds a queue route" do
+        @broker.bridges.count.should == 1
+      end
+
+      subject { @broker.bridges[0] }
+      its(:dest) { should == 'amq.direct' }
+      its(:durable) { should == false }
+      its(:dynamic) { should == false }
+      its(:excludes) { should == "" }
+      its(:key) { should == "" }
+      its(:name) { should == "qr1" }
+      its(:src) { should == "queue" }
+      its(:srcIsLocal) { should == false }
+      its(:srcIsQueue) { should == true }
+      its(:sync) { should == 2 }
+      its(:tag) { should == "" }
+    end
+  end
+
+  describe "#add_exchange_route" do
+    context "with missing options" do
+      [:link, :exchange, :key, :sync].each do |opt|
+        opts = {link: 'l', exchange: 'e', key:'rk', sync:2}
+        opts.delete(opt)
+        it "raises an error when :#{opt} is missing" do
+          expect { @broker.add_exchange_route('name', opts) }.to raise_error(/Option :#{opt} is required/)
+        end
+      end
     end
 
-    it "adds a queue route" do
-      @broker.bridges.count.should == 1
+    context "with all required options" do
+      before(:each) do
+        @other_port = `/usr/sbin/qpidd --no-data-dir --auth=no --no-module-dir --daemon --port 0`.chop
+        @broker.add_link('link1', 'localhost', @other_port)
+        @broker.add_queue('queue')
+        @broker.add_exchange_route('er1',
+                                link: 'link1',
+                                exchange: 'amq.direct',
+                                key: 'foo',
+                                sync: 2)
+      end
+
+      after(:each) do
+        `/usr/sbin/qpidd -q --port #{@other_port}`
+      end
+
+      it "adds an exchange route" do
+        @broker.bridges.count.should == 1
+      end
+
+      subject { @broker.bridges[0] }
+      its(:dest) { should == 'amq.direct' }
+      its(:durable) { should == false }
+      its(:dynamic) { should == false }
+      its(:excludes) { should == "" }
+      its(:key) { should == "foo" }
+      its(:name) { should == "er1" }
+      its(:src) { should == "amq.direct" }
+      its(:srcIsLocal) { should == false }
+      its(:srcIsQueue) { should == false }
+      its(:sync) { should == 2 }
+      its(:tag) { should == "" }
+    end
+  end
+
+  describe "#add_dynamic_route" do
+    context "with missing options" do
+      [:link, :exchange, :sync].each do |opt|
+        opts = {link: 'l', exchange: 'e', sync:2}
+        opts.delete(opt)
+        it "raises an error when :#{opt} is missing" do
+          expect { @broker.add_dynamic_route('name', opts) }.to raise_error(/Option :#{opt} is required/)
+        end
+      end
     end
 
-    subject { @broker.bridges[0] }
-    its(:dest) { should == 'amq.direct' }
-    its(:durable) { should == false }
-    its(:dynamic) { should == false }
-    its(:excludes) { should == "" }
-    its(:key) { should == "" }
-    its(:name) { should == "qr1" }
-    its(:src) { should == "queue" }
-    its(:srcIsLocal) { should == false }
-    its(:srcIsQueue) { should == true }
-    its(:sync) { should == 2 }
-    its(:tag) { should == "" }
+    context "with all required options" do
+      before(:each) do
+        @other_port = `/usr/sbin/qpidd --no-data-dir --auth=no --no-module-dir --daemon --port 0`.chop
+        @broker.add_link('link1', 'localhost', @other_port)
+        @broker.add_queue('queue')
+        @broker.add_dynamic_route('dr1',
+                                link: 'link1',
+                                exchange: 'amq.direct',
+                                sync: 2)
+      end
+
+      after(:each) do
+        `/usr/sbin/qpidd -q --port #{@other_port}`
+      end
+
+      it "adds an exchange route" do
+        @broker.bridges.count.should == 1
+      end
+
+      subject { @broker.bridges[0] }
+      its(:dest) { should == 'amq.direct' }
+      its(:durable) { should == false }
+      its(:dynamic) { should == true }
+      its(:excludes) { should == "" }
+      its(:key) { should == "" }
+      its(:name) { should == "dr1" }
+      its(:src) { should == "amq.direct" }
+      its(:srcIsLocal) { should == false }
+      its(:srcIsQueue) { should == false }
+      its(:sync) { should == 2 }
+      its(:tag) { should == "" }
+    end
   end
 end
